@@ -5,6 +5,11 @@
     <link rel="stylesheet" href="./css/styles.css">
 </head>
 <body>
+    <div class="window-controls">
+        <button id="minimize-btn">-</button>
+        <button id="close-btn">×</button>
+    </div>
+
     <div class="container" id="loginContainer">
         <div class="login-form">
             <div class="logo">
@@ -19,47 +24,46 @@
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
             </div>
-            <button type="submit" id="loginButton">Login</button>
+            <button type="submit" id="loginButton">Initiate Access</button>
             <div id="loginError" class="error-message"></div>
         </div>
     </div>
 
     <div class="dashboard" id="dashboard">
         <div class="dashboard-header">
-            <div class="controls">
-                <button id="minimize-btn">-</button>
-                <button id="close-btn">×</button>
-            </div>
+            <div class="status-badge">Sentinel is Live</div>
             <div class="logo">
-                <img src="../assets/sentinalprime.png" alt="Sentinel Prime" style="width: 120px;">
+                <img src="../assets/sentinalprime.png" alt="Sentinel Prime">
             </div>
-            <div class="logout-container">
-                <button class="logout-btn" id="logoutButton">Logout</button>
-            </div>
+            <button class="logout-btn" id="logoutButton">
+                Exit System
+            </button>
         </div>
-        <div class="dashboard-body">
-            <div class="security-card">
-                <div class="security-status">
-                    <div class="tier" id="securityTier">RELIABLE</div>
-                    <div class="status-description" id="statusDescription">
-                        Your system activity indicates normal behavior patterns.
-                        Continue maintaining good security practices.
-                    </div>
+        
+        <div class="security-card">
+            <div class="security-status">
+                <div class="tier" id="securityTier">RELIABLE</div>
+                <div class="status-description" id="statusDescription">
+                    Your system activity indicates normal behavior patterns.
+                    Continue maintaining good security practices.
                 </div>
             </div>
+        </div>
 
-            <div class="system-status-card">
-                <h3>System Status</h3>
-                <div class="system-info">
-                    <div class="info-item">
-                        CPU Usage: <span id="cpu-usage"></span>%
-                    </div>
-                    <div class="info-item">
-                        RAM Usage: <span id="ram-usage"></span>%
-                    </div>
-                    <div class="info-item">
-                        Storage: <span id="storage-info"></span>
-                    </div>
+        <div class="system-status-card">
+            <h3>System Diagnostics</h3>
+            <div class="system-info">
+                <div class="info-item">
+                    <label>CPU Utilization</label>
+                    <div><span id="cpu-usage">0.0</span>%</div>
+                </div>
+                <div class="info-item">
+                    <label>Memory Usage</label>
+                    <div><span id="ram-usage">0.0</span>%</div>
+                </div>
+                <div class="info-item">
+                    <label>Storage Status</label>
+                    <div><span id="storage-info">Analyzing...</span></div>
                 </div>
             </div>
         </div>
