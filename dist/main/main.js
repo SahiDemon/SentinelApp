@@ -65,7 +65,7 @@ function createSplashScreen() {
 function createMainWindow() {
   const mainWindow = new BrowserWindow({
     width: 800,
-    height: 600,
+    height: 650,
     show: false,
     frame: false,
     backgroundColor: "#001529",
@@ -115,7 +115,7 @@ app.whenReady().then(() => {
   setTimeout(() => {
     splash.close();
     mainWindow.show();
-  }, 5e3);
+  }, 7e3);
   app.on("window-all-closed", () => {
     if (process.platform !== "darwin") {
       app.quit();
