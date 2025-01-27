@@ -7031,6 +7031,9 @@ async function getUserSecurityTier() {
     }
     let description = "";
     switch (securityData.tier) {
+      case "TRUSTED":
+        description = "Your exceptional security practices have earned you trusted status. Continue setting the standard for system security.";
+        break;
       case "RELIABLE":
         description = "Your system activity indicates normal behavior patterns. Continue maintaining good security practices.";
         break;

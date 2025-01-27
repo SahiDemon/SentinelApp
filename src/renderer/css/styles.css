@@ -10,6 +10,7 @@
     --danger-color: #ff4d4f;
     --warning-color: #faad14;
     --success-color: #52c41a;
+    --trusted-color: #389e0d;
 }
 
 body {
@@ -91,30 +92,7 @@ body {
 
 .logo {
     text-align: center;
-    margin-bottom: 30px;
-    position: relative;
-}
-
-.logo::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 15px;
-    bottom: -5px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: radial-gradient(circle, #1890ff 0%, transparent 70%);
-    filter: blur(8px);
-    opacity: 0.6;
-    animation: glowPulse 2s infinite;
-}
-@keyframes logoPulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
+    margin-bottom: 1.2rem;
 }
 
 .logo img {
@@ -122,9 +100,7 @@ body {
     height: auto;
     object-fit: contain;
     filter: drop-shadow(0 0 8px var(--primary-glow));
-    animation: logoPulse 2s infinite;
 }
-
 
 .app-title {
     text-align: center;
@@ -237,7 +213,7 @@ button:hover {
 
 .user-greeting {
     position: absolute;
-    bottom: 8px;
+    bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
@@ -322,6 +298,16 @@ button:hover {
     border-radius: 50%;
 }
 
+.tier.TRUSTED {
+    color: var(--trusted-color);
+    text-shadow: 0 0 8px var(--trusted-color);
+}
+
+.tier.TRUSTED::before {
+    background: var(--trusted-color);
+    box-shadow: 0 0 8px var(--trusted-color);
+}
+
 .tier.RELIABLE {
     color: var(--success-color);
     text-shadow: 0 0 8px var(--success-color);
@@ -359,10 +345,6 @@ button:hover {
     text-align: center;
     max-width: 500px;
     margin: 0 auto;
-}
-
-.tranformer-font {
-    font-family: 'Orbitron', Arial, sans-serif;
 }
 
 .system-status-card {
@@ -432,16 +414,5 @@ button:hover {
     to {
         opacity: 1;
         transform: translateY(0);
-    }
-}
-
-@keyframes glowPulse {
-    0%, 100% {
-        opacity: 0.6;
-        transform: translateX(-50%) scale(1);
-    }
-    50% {
-        opacity: 0.8;
-        transform: translateX(-50%) scale(1.1);
     }
 }

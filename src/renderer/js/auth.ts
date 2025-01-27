@@ -16,7 +16,6 @@ export async function handleLogin(email: string, password: string, rememberSessi
 
         if (error) throw error;
         
-        // Store session if remember me is checked
         if (rememberSession && data.session) {
             localStorage.setItem(SESSION_KEY, JSON.stringify({
                 email: data.user?.email || null,
@@ -98,6 +97,9 @@ export async function getUserSecurityTier(): Promise<{ tier: string; description
 
         let description = '';
         switch (securityData.tier) {
+            case 'TRUSTED':
+                description = 'Your exceptional security practices have earned you trusted status. Continue setting the standard for system security.';
+                break;
             case 'RELIABLE':
                 description = 'Your system activity indicates normal behavior patterns. Continue maintaining good security practices.';
                 break;
