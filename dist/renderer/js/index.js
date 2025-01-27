@@ -6963,13 +6963,20 @@ var supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 var supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // src/renderer/js/auth.ts
-async function handleLogin(email, password) {
+var SESSION_KEY = "sentinel_session";
+async function handleLogin(email, password, rememberSession = false) {
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
     });
     if (error) throw error;
+    if (rememberSession && data.session) {
+      localStorage.setItem(SESSION_KEY, JSON.stringify({
+        email: data.user?.email || null,
+        id: data.user?.id
+      }));
+    }
     return { success: true };
   } catch (error) {
     return {
@@ -6980,10 +6987,34 @@ async function handleLogin(email, password) {
 }
 async function handleLogout() {
   await supabase.auth.signOut();
+  localStorage.removeItem(SESSION_KEY);
+}
+async function getCurrentUser() {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      return {
+        email: user.email || null,
+        id: user.id
+      };
+    }
+    const savedSession = localStorage.getItem(SESSION_KEY);
+    if (savedSession) {
+      const parsed = JSON.parse(savedSession);
+      return {
+        email: parsed.email || null,
+        id: parsed.id
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error("Error getting current user:", error);
+    return null;
+  }
 }
 async function getUserSecurityTier() {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser();
     if (!user) {
       return {
         tier: "UNKNOWN",
@@ -7030,11 +7061,16 @@ var { ipcRenderer } = __require("electron");
 async function handleLogin2() {
   const username = document.getElementById("username");
   const password = document.getElementById("password");
+  const rememberMe = document.getElementById("rememberMe");
   try {
-    const result = await handleLogin(username.value, password.value);
+    const result = await handleLogin(username.value, password.value, rememberMe.checked);
     if (result.success) {
       document.getElementById("loginContainer").style.display = "none";
       document.getElementById("dashboard").style.display = "block";
+      const user = await getCurrentUser();
+      if (user?.email) {
+        document.getElementById("userEmail").textContent = user.email;
+      }
       await init();
     } else {
       throw new Error(result.error);
@@ -7087,7 +7123,21 @@ async function init() {
   await fetchSystemInfo();
   setInterval(fetchSystemInfo, 5e3);
 }
+async function checkSession() {
+  try {
+    const user = await getCurrentUser();
+    if (user) {
+      document.getElementById("loginContainer").style.display = "none";
+      document.getElementById("dashboard").style.display = "block";
+      document.getElementById("userEmail").textContent = user.email || "";
+      await init();
+    }
+  } catch (error) {
+    console.error("Session check failed:", error);
+  }
+}
 document.addEventListener("DOMContentLoaded", () => {
+  checkSession();
   document.getElementById("loginButton")?.addEventListener("click", handleLogin2);
   document.getElementById("logoutButton")?.addEventListener("click", handleLogout2);
   document.getElementById("password")?.addEventListener("keypress", (event) => {

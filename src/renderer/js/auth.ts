@@ -1,18 +1,13 @@
 import { supabase } from '../../supabase/client';
-import { shell } from 'electron';
 
-// Using localhost for development, this will be caught by our protocol handler
-const SITE_URL = 'http://localhost:3000/auth/callback';
-const SUPABASE_STORAGE_KEY = 'sb';
+const SESSION_KEY = 'sentinel_session';
 
-// Helper to get stored session
-function getStoredSession() {
-    const accessToken = localStorage.getItem(`${SUPABASE_STORAGE_KEY}-access-token`);
-    const refreshToken = localStorage.getItem(`${SUPABASE_STORAGE_KEY}-refresh-token`);
-    return { accessToken, refreshToken };
+export interface UserSession {
+    email: string | null;
+    id: string;
 }
 
-export async function handleLogin(email: string, password: string): Promise<{ success: boolean; error?: string }> {
+export async function handleLogin(email: string, password: string, rememberSession: boolean = false): Promise<{ success: boolean; error?: string }> {
     try {
         const { data, error } = await supabase.auth.signInWithPassword({
             email,
@@ -20,6 +15,14 @@ export async function handleLogin(email: string, password: string): Promise<{ su
         });
 
         if (error) throw error;
+        
+        // Store session if remember me is checked
+        if (rememberSession && data.session) {
+            localStorage.setItem(SESSION_KEY, JSON.stringify({
+                email: data.user?.email || null,
+                id: data.user?.id
+            }));
+        }
 
         return { success: true };
     } catch (error: any) {
@@ -30,43 +33,47 @@ export async function handleLogin(email: string, password: string): Promise<{ su
     }
 }
 
-export async function handleSignup(email: string, password: string): Promise<{ success: boolean; error?: string }> {
-    const { accessToken, refreshToken } = getStoredSession();
+export async function handleLogout(): Promise<void> {
+    await supabase.auth.signOut();
+    localStorage.removeItem(SESSION_KEY);
+}
+
+export async function getCurrentUser(): Promise<UserSession | null> {
     try {
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-                emailRedirectTo: SITE_URL
-            }
-        });
-
-        if (error) throw error;
-
-        return { 
-            success: true,
-            error: 'Signup successful! Please check your email for verification.'
-        };
-    } catch (error: any) {
-        return { 
-            success: false, 
-            error: error?.message || 'An error occurred during signup'
-        };
+        // First check for session in Supabase
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            return {
+                email: user.email || null,
+                id: user.id
+            };
+        }
+        
+        // If no active session, check local storage
+        const savedSession = localStorage.getItem(SESSION_KEY);
+        if (savedSession) {
+            const parsed = JSON.parse(savedSession);
+            return {
+                email: parsed.email || null,
+                id: parsed.id
+            };
+        }
+        
+        return null;
+    } catch (error) {
+        console.error('Error getting current user:', error);
+        return null;
     }
 }
 
-export async function handleLogout(): Promise<void> {
-    await supabase.auth.signOut();
-}
-
 export async function checkSession(): Promise<boolean> {
-    const { data: { session } } = await supabase.auth.getSession();
-    return session !== null;
+    const user = await getCurrentUser();
+    return user !== null;
 }
 
 export async function getUserSecurityTier(): Promise<{ tier: string; description: string }> {
     try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const user = await getCurrentUser();
         
         if (!user) {
             return {

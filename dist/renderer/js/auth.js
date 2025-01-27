@@ -6957,20 +6957,20 @@ var supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 var supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // src/renderer/js/auth.ts
-var SITE_URL = "http://localhost:3000/auth/callback";
-var SUPABASE_STORAGE_KEY = "sb";
-function getStoredSession() {
-  const accessToken = localStorage.getItem(`${SUPABASE_STORAGE_KEY}-access-token`);
-  const refreshToken = localStorage.getItem(`${SUPABASE_STORAGE_KEY}-refresh-token`);
-  return { accessToken, refreshToken };
-}
-async function handleLogin(email, password) {
+var SESSION_KEY = "sentinel_session";
+async function handleLogin(email, password, rememberSession = false) {
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
     });
     if (error) throw error;
+    if (rememberSession && data.session) {
+      localStorage.setItem(SESSION_KEY, JSON.stringify({
+        email: data.user?.email || null,
+        id: data.user?.id
+      }));
+    }
     return { success: true };
   } catch (error) {
     return {
@@ -6979,38 +6979,40 @@ async function handleLogin(email, password) {
     };
   }
 }
-async function handleSignup(email, password) {
-  const { accessToken, refreshToken } = getStoredSession();
-  try {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: SITE_URL
-      }
-    });
-    if (error) throw error;
-    return {
-      success: true,
-      error: "Signup successful! Please check your email for verification."
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: error?.message || "An error occurred during signup"
-    };
-  }
-}
 async function handleLogout() {
   await supabase.auth.signOut();
+  localStorage.removeItem(SESSION_KEY);
+}
+async function getCurrentUser() {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      return {
+        email: user.email || null,
+        id: user.id
+      };
+    }
+    const savedSession = localStorage.getItem(SESSION_KEY);
+    if (savedSession) {
+      const parsed = JSON.parse(savedSession);
+      return {
+        email: parsed.email || null,
+        id: parsed.id
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error("Error getting current user:", error);
+    return null;
+  }
 }
 async function checkSession() {
-  const { data: { session } } = await supabase.auth.getSession();
-  return session !== null;
+  const user = await getCurrentUser();
+  return user !== null;
 }
 async function getUserSecurityTier() {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser();
     if (!user) {
       return {
         tier: "UNKNOWN",
@@ -7053,8 +7055,8 @@ async function getUserSecurityTier() {
 }
 export {
   checkSession,
+  getCurrentUser,
   getUserSecurityTier,
   handleLogin,
-  handleLogout,
-  handleSignup
+  handleLogout
 };

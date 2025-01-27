@@ -1,15 +1,23 @@
-import { handleLogin as login, handleLogout as logout, getUserSecurityTier } from './auth.js';
+import { handleLogin as login, handleLogout as logout, getUserSecurityTier, getCurrentUser } from './auth.js';
 const { ipcRenderer } = require('electron');
 
 async function handleLogin() {
     const username = document.getElementById('username') as HTMLInputElement;
     const password = document.getElementById('password') as HTMLInputElement;
+    const rememberMe = document.getElementById('rememberMe') as HTMLInputElement;
     
     try {
-        const result = await login(username.value, password.value);
+        const result = await login(username.value, password.value, rememberMe.checked);
         if (result.success) {
             document.getElementById('loginContainer')!.style.display = 'none';
             document.getElementById('dashboard')!.style.display = 'block';
+            
+            // Set user email in greeting
+            const user = await getCurrentUser();
+            if (user?.email) {
+                document.getElementById('userEmail')!.textContent = user.email;
+            }
+            
             await init();
         } else {
             throw new Error(result.error);
@@ -74,8 +82,26 @@ async function init() {
     setInterval(fetchSystemInfo, 5000); // Update system info every 5 seconds
 }
 
+// Check for existing session on startup
+async function checkSession() {
+    try {
+        const user = await getCurrentUser();
+        if (user) {
+            document.getElementById('loginContainer')!.style.display = 'none';
+            document.getElementById('dashboard')!.style.display = 'block';
+            document.getElementById('userEmail')!.textContent = user.email || '';
+            await init();
+        }
+    } catch (error) {
+        console.error('Session check failed:', error);
+    }
+}
+
 // Add event listeners when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    // Check for existing session
+    checkSession();
+    
     // Login and logout buttons
     document.getElementById('loginButton')?.addEventListener('click', handleLogin);
     document.getElementById('logoutButton')?.addEventListener('click', handleLogout);
