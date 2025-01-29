@@ -1,0 +1,12 @@
+psutil==5.9.8
+watchdog==3.0.0
+pywin32==306
+python-dotenv==1.0.0
+fastapi==0.109.0
+uvicorn==0.27.0
+supabase==2.3.1
+pydantic==2.5.3
+wmi==1.5.1
+pyshark==0.6.0
+pyautogui==0.9.53
+cryptography==40.0.1

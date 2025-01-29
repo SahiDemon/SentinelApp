@@ -1,0 +1,20 @@
+2025-01-28 22:00:22 - INFO - Starting USB device monitoring...
+2025-01-28 22:00:22 - INFO - Monitoring for USB drive events...
+2025-01-28 22:01:20 - INFO - New USB drive detected (H:)
+Volume Name: ESD-USB
+Filesystem: FAT32
+Total Size: 31,439,454,208 bytes
+2025-01-28 22:01:20 - INFO - USB Drive Inventory (H:)
+Total Files: 4
+Total Size: 1,445,867 bytes
+Files:
+  - Just My Luck (2006) [720p] [BluRay] [YTS.MX].torrent (35,721 bytes)
+  - imDDage.png (1,410,058 bytes)
+  - System Volume Information\WPSettings.dat (12 bytes)
+  - System Volume Information\IndexerVolumeGuid (76 bytes)
+2025-01-28 22:01:37 - INFO - USB drive removed: H:
+2025-01-28 22:01:37 - INFO - USB Drive Inventory (H:)
+Total Files: 0
+Total Size: 0 bytes
+Files:
+

@@ -1,0 +1,253 @@
+2025-01-28 22:00:18 - INFO - Starting network monitoring...
+2025-01-28 22:00:18 - INFO - Monitoring non-browser network connections...
+2025-01-28 22:00:18 - INFO - Network Activity | Process: language_server_windows_x64.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:7781 | Status: ESTABLISHED | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:00:18 - INFO - Network Activity | Process: Windsurf.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:7623 | Status: ESTABLISHED | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:00:18 - INFO - Network Activity | Process: python.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:2939 | Status: ESTABLISHED | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:00:18 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:9762 | Status: CLOSE_WAIT | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:00:34 - INFO - Network Activity | Process: Code.exe | Domain: 13.107.246.59 | IP: 13.107.246.59:443 | Status: CLOSE_WAIT
+2025-01-28 22:00:34 - INFO - Network Activity | Process: language_server_windows_x64.exe | Domain: 178.238.223.35.bc.googleusercontent.com | IP: 35.223.238.178:443 | Status: ESTABLISHED | Recent Domains: 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:00:34 - INFO - Network Activity | Process: python.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:10126 | Status: ESTABLISHED | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:00:34 - INFO - Network Activity | Process: Windsurf.exe | Domain: 178.238.223.35.bc.googleusercontent.com | IP: 35.223.238.178:443 | Status: ESTABLISHED | Recent Domains: 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:00:34 - INFO - Network Activity | Process: language_server_windows_x64.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:7717 | Status: ESTABLISHED | Recent Domains: 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:00:34 - INFO - Network Activity | Process: Windsurf.exe | Domain: 178.238.223.35.bc.googleusercontent.com | IP: 35.223.238.178:443 | Status: ESTABLISHED | Recent Domains: 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:00:34 - INFO - Network Activity | Process: IDMIntegrator64.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:13470 | Status: ESTABLISHED | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:00:34 - INFO - Network Activity | Process: Windsurf.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:7623 | Status: ESTABLISHED | Recent Domains: 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:00:34 - INFO - Network Activity | Process: language_server_windows_x64.exe | Domain: 178.238.223.35.bc.googleusercontent.com | IP: 35.223.238.178:443 | Status: ESTABLISHED | Recent Domains: 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:00:34 - INFO - Network Activity | Process: python.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:10124 | Status: ESTABLISHED | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:00:38 - INFO - Network Activity | Process: PhoneExperienceHost.exe | Domain: 20.195.84.16 | IP: 20.195.84.16:443 | Status: ESTABLISHED
+2025-01-28 22:00:38 - INFO - Network Activity | Process: GitHubDesktop.exe | Domain: lb-140-82-114-26-iad.github.com | IP: 140.82.114.26:443 | Status: ESTABLISHED | Recent Domains: lb-140-82-114-26-iad.github.com
+2025-01-28 22:00:38 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:00:38 - INFO - Network Activity | Process: python.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:10125 | Status: ESTABLISHED | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:00:38 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:00:48 - INFO - Network Activity | Process: Code.exe | Domain: 169.254.169.254 | IP: 169.254.169.254:80 | Status: SYN_SENT
+2025-01-28 22:00:48 - INFO - Network Activity | Process: python.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:2938 | Status: ESTABLISHED | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:00:53 - INFO - Network Activity | Process: Code.exe | Domain: 20.189.172.73 | IP: 20.189.172.73:443 | Status: ESTABLISHED
+2025-01-28 22:00:53 - INFO - Network Activity | Process: Discord.exe | Domain: 45.224.186.35.bc.googleusercontent.com | IP: 35.186.224.45:443 | Status: ESTABLISHED | Recent Domains: 45.224.186.35.bc.googleusercontent.com
+2025-01-28 22:00:53 - INFO - Network Activity | Process: Windsurf.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:7715 | Status: ESTABLISHED | Recent Domains: 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:00:53 - INFO - Network Activity | Process: Windsurf.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:7623 | Status: ESTABLISHED | Recent Domains: 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:00:53 - INFO - Network Activity | Process: Windsurf.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:7623 | Status: ESTABLISHED | Recent Domains: 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:00:53 - INFO - Network Activity | Process: language_server_windows_x64.exe | Domain: 178.238.223.35.bc.googleusercontent.com | IP: 35.223.238.178:443 | Status: ESTABLISHED | Recent Domains: 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:00:57 - INFO - Network Activity | Process: Code.exe | Domain: 13.67.9.5 | IP: 13.67.9.5:443 | Status: ESTABLISHED
+2025-01-28 22:00:57 - INFO - Network Activity | Process: python.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:2937 | Status: ESTABLISHED | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:02 - INFO - Network Activity | Process: Code.exe | Domain: 13.107.246.59 | IP: 13.107.246.59:443 | Status: ESTABLISHED
+2025-01-28 22:01:02 - INFO - Network Activity | Process: python.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:10127 | Status: ESTABLISHED | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:02 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:17 - INFO - Network Activity | Process: Code.exe | Domain: 20.189.173.27 | IP: 20.189.173.27:443 | Status: ESTABLISHED
+2025-01-28 22:01:17 - INFO - Network Activity | Process: Code.exe | Domain: lb-140-82-112-21-iad.github.com | IP: 140.82.112.21:443 | Status: ESTABLISHED | Recent Domains: lb-140-82-112-21-iad.github.com
+2025-01-28 22:01:22 - INFO - Network Activity | Process: Discord.exe | Domain: 162.159.136.234 | IP: 162.159.136.234:443 | Status: ESTABLISHED | Recent Domains: 45.224.186.35.bc.googleusercontent.com
+2025-01-28 22:01:22 - INFO - Network Activity | Process: Windsurf.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:7623 | Status: ESTABLISHED | Recent Domains: 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:01:22 - INFO - Network Activity | Process: python.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:2940 | Status: ESTABLISHED | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:23 - INFO - Network Activity | Process: language_server_windows_x64.exe | Domain: 192.34.20.166.static.coresite.com | IP: 192.34.20.166:443 | Status: ESTABLISHED | Recent Domains: 192.34.20.166.static.coresite.com, 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:01:28 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:32 - INFO - Network Activity | Process: language_server_windows_x64.exe | Domain: 192.34.20.166.static.coresite.com | IP: 192.34.20.166:443 | Status: ESTABLISHED | Recent Domains: 192.34.20.166.static.coresite.com, 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:01:51 - INFO - Network Activity | Process: language_server_windows_x64.exe | Domain: 178.238.223.35.bc.googleusercontent.com | IP: 35.223.238.178:443 | Status: ESTABLISHED | Recent Domains: 192.34.20.166.static.coresite.com, 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:01:51 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:01:51 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:01:51 - INFO - Connection Closed | Process: Code.exe | Address: 169.254.169.254:80
+2025-01-28 22:01:51 - INFO - Connection Closed | Process: Code.exe | Address: 20.189.172.73:443
+2025-01-28 22:01:51 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:01:52 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:52 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:52 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:52 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:52 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:52 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:52 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:52 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:52 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:52 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:52 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:52 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:52 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:52 - INFO - Network Activity | Process: language_server_windows_x64.exe | Domain: 192.34.20.166.static.coresite.com | IP: 192.34.20.166:443 | Status: ESTABLISHED | Recent Domains: 192.34.20.166.static.coresite.com, 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:01:52 - INFO - Network Activity | Process: language_server_windows_x64.exe | Domain: 192.34.20.166.static.coresite.com | IP: 192.34.20.166:443 | Status: ESTABLISHED | Recent Domains: 192.34.20.166.static.coresite.com, 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:01:56 - INFO - Network Activity | Process: Code.exe | Domain: lb-140-82-114-21-iad.github.com | IP: 140.82.114.21:443 | Status: ESTABLISHED | Recent Domains: lb-140-82-114-21-iad.github.com, lb-140-82-112-21-iad.github.com
+2025-01-28 22:01:56 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:56 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:56 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:56 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:56 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:56 - INFO - Network Activity | Process: Code.exe | Domain: lb-140-82-114-21-iad.github.com | IP: 140.82.114.21:443 | Status: ESTABLISHED | Recent Domains: lb-140-82-114-21-iad.github.com, lb-140-82-112-21-iad.github.com
+2025-01-28 22:01:56 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:01:56 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:02:06 - INFO - Network Activity | Process: Windsurf.exe | Domain: 2402:d000:130:1::684b:5409 | IP: 2402:d000:130:1::684b:5409:443 | Status: ESTABLISHED | Recent Domains: 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:02:06 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:02:11 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:02:11 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:02:11 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:02:11 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:02:16 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:02:16 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:02:20 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:02:20 - INFO - Connection Closed | Process: Code.exe | Address: 13.107.246.59:443
+2025-01-28 22:02:20 - INFO - Connection Closed | Process: Windsurf.exe | Address: 35.223.238.178:443
+2025-01-28 22:02:20 - INFO - Connection Closed | Process: Code.exe | Address: 13.107.246.59:443
+2025-01-28 22:02:20 - INFO - Connection Closed | Process: language_server_windows_x64.exe | Address: 192.34.20.166:443
+2025-01-28 22:02:20 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:20 - INFO - Connection Closed | Process: language_server_windows_x64.exe | Address: 192.34.20.166:443
+2025-01-28 22:02:21 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:02:21 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:02:21 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:02:21 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:02:21 - INFO - Network Activity | Process: language_server_windows_x64.exe | Domain: 192.34.20.166.static.coresite.com | IP: 192.34.20.166:443 | Status: ESTABLISHED | Recent Domains: 192.34.20.166.static.coresite.com, 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:02:21 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:02:26 - INFO - Network Activity | Process: language_server_windows_x64.exe | Domain: 192.34.20.166.static.coresite.com | IP: 192.34.20.166:443 | Status: ESTABLISHED | Recent Domains: 192.34.20.166.static.coresite.com, 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:02:30 - INFO - Network Activity | Process: Code.exe | Domain: 13.107.246.59 | IP: 13.107.246.59:443 | Status: ESTABLISHED | Recent Domains: lb-140-82-114-21-iad.github.com, lb-140-82-112-21-iad.github.com
+2025-01-28 22:02:45 - INFO - Network Activity | Process: Code.exe | Domain: 13.107.246.59 | IP: 13.107.246.59:443 | Status: CLOSE_WAIT | Recent Domains: lb-140-82-114-21-iad.github.com, lb-140-82-112-21-iad.github.com
+2025-01-28 22:02:45 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:02:54 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:02:59 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: language_server_windows_x64.exe | Address: 192.34.20.166:443
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: language_server_windows_x64.exe | Address: 192.34.20.166:443
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: Code.exe | Address: 140.82.114.21:443
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: Code.exe | Address: 140.82.114.21:443
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:02:59 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:03:00 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:00 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:00 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:01 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:05 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:05 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:05 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:05 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:05 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:05 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:05 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:05 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:05 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:05 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:05 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:10 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:10 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:10 - INFO - Network Activity | Process: esrv.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:10 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:10 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:10 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:10 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:10 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:10 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:10 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:10 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:20 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:20 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:25 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:25 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:25 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:25 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:25 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:25 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:25 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:29 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:29 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:29 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:29 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:29 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:29 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:29 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:29 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:29 - INFO - Network Activity | Process: esrv.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:29 - INFO - Network Activity | Process: esrv.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:29 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:29 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:29 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:29 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:29 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:29 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:29 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:34 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:34 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:34 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:34 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:34 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:39 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:39 - INFO - Network Activity | Process: Unknown | Domain: ec2-44-197-254-94.compute-1.amazonaws.com | IP: 44.197.254.94:443 | Status: ESTABLISHED | Recent Domains: ec2-44-197-254-94.compute-1.amazonaws.com
+2025-01-28 22:03:39 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:39 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:39 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:39 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:39 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:39 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:43 - INFO - Network Activity | Process: Unknown | Domain: 146.75.46.217 | IP: 146.75.46.217:443 | Status: ESTABLISHED | Recent Domains: ec2-44-197-254-94.compute-1.amazonaws.com
+2025-01-28 22:03:43 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:43 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:43 - INFO - Connection Closed | Process: Windsurf.exe | Address: 35.223.238.178:443
+2025-01-28 22:03:43 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:03:43 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:03:43 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:03:43 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:03:43 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:03:43 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:03:43 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:03:43 - INFO - Connection Closed | Process: esrv_svc.exe | Address: 127.0.0.1:49350
+2025-01-28 22:03:44 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:44 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:49 - INFO - Network Activity | Process: Code.exe | Domain: 20.205.243.168 | IP: 20.205.243.168:443 | Status: ESTABLISHED | Recent Domains: lb-140-82-114-21-iad.github.com, lb-140-82-112-21-iad.github.com
+2025-01-28 22:03:49 - INFO - Network Activity | Process: language_server_windows_x64.exe | Domain: 192.34.20.166.static.coresite.com | IP: 192.34.20.166:443 | Status: ESTABLISHED | Recent Domains: 192.34.20.166.static.coresite.com, 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:03:49 - INFO - Network Activity | Process: language_server_windows_x64.exe | Domain: 192.34.20.166.static.coresite.com | IP: 192.34.20.166:443 | Status: ESTABLISHED | Recent Domains: 192.34.20.166.static.coresite.com, 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:03:49 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:49 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:53 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:58 - INFO - Network Activity | Process: Code.exe | Domain: 20.205.243.168 | IP: 20.205.243.168:443 | Status: ESTABLISHED | Recent Domains: lb-140-82-114-21-iad.github.com, lb-140-82-112-21-iad.github.com
+2025-01-28 22:03:58 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:58 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:58 - INFO - Network Activity | Process: language_server_windows_x64.exe | Domain: 192.34.20.166.static.coresite.com | IP: 192.34.20.166:443 | Status: ESTABLISHED | Recent Domains: 192.34.20.166.static.coresite.com, 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:03:58 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:58 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:58 - INFO - Network Activity | Process: language_server_windows_x64.exe | Domain: 192.34.20.166.static.coresite.com | IP: 192.34.20.166:443 | Status: ESTABLISHED | Recent Domains: 192.34.20.166.static.coresite.com, 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:03:58 - INFO - Network Activity | Process: esrv_svc.exe | Domain: kubernetes.docker.internal | IP: 127.0.0.1:49350 | Status: FIN_WAIT2 | Recent Domains: kubernetes.docker.internal
+2025-01-28 22:03:58 - INFO - Network Activity | Process: language_server_windows_x64.exe | Domain: 192.34.20.166.static.coresite.com | IP: 192.34.20.166:443 | Status: ESTABLISHED | Recent Domains: 192.34.20.166.static.coresite.com, 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
+2025-01-28 22:04:08 - INFO - Network Activity | Process: language_server_windows_x64.exe | Domain: 192.34.20.166.static.coresite.com | IP: 192.34.20.166:443 | Status: ESTABLISHED | Recent Domains: 192.34.20.166.static.coresite.com, 178.238.223.35.bc.googleusercontent.com, kubernetes.docker.internal
