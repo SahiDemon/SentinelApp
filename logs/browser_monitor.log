@@ -1,0 +1,24 @@
+2025-02-01 23:02:41 - INFO - Starting browser monitoring...
+2025-02-01 23:02:41 - INFO - Starting browser monitoring...
+2025-02-01 23:02:41 - INFO - Tracking browser activity...
+2025-02-01 23:02:41 - INFO - Tracking browser activity...
+2025-02-01 23:02:41 - INFO - Detected new Google Chrome instance (PID: 1620)
+2025-02-01 23:02:41 - INFO - Detected new Google Chrome instance (PID: 1620)
+2025-02-01 23:02:41 - INFO - Detected new Microsoft Edge instance (PID: 2748)
+2025-02-01 23:02:41 - INFO - Detected new Microsoft Edge instance (PID: 2748)
+2025-02-01 23:02:41 - INFO - Detected new Google Chrome instance (PID: 7504)
+2025-02-01 23:02:41 - INFO - Detected new Google Chrome instance (PID: 7504)
+2025-02-01 23:02:41 - INFO - Detected new Microsoft Edge instance (PID: 12940)
+2025-02-01 23:02:41 - INFO - Detected new Microsoft Edge instance (PID: 12940)
+2025-02-01 23:02:41 - INFO - Detected new Google Chrome instance (PID: 13212)
+2025-02-01 23:02:41 - INFO - Detected new Google Chrome instance (PID: 13212)
+2025-02-01 23:02:41 - INFO - Detected new Google Chrome instance (PID: 16684)
+2025-02-01 23:02:41 - INFO - Detected new Google Chrome instance (PID: 16684)
+2025-02-01 23:02:41 - INFO - Detected new Google Chrome instance (PID: 18068)
+2025-02-01 23:02:41 - INFO - Detected new Google Chrome instance (PID: 18068)
+2025-02-01 23:02:59 - INFO - Browser Activity | Microsoft Edge | Activity: kubernetes.docker.internal
+2025-02-01 23:02:59 - INFO - Browser Activity | Microsoft Edge | Activity: kubernetes.docker.internal
+2025-02-01 23:03:29 - INFO - Browser Activity | Google Chrome | Activity: kubernetes.docker.internal
+2025-02-01 23:03:29 - INFO - Browser Activity | Google Chrome | Activity: kubernetes.docker.internal
+2025-02-01 23:03:34 - INFO - Browser Activity | Google Chrome | Activity: cdn-185-199-110-133.github.com
+2025-02-01 23:03:34 - INFO - Browser Activity | Google Chrome | Activity: cdn-185-199-110-133.github.com
