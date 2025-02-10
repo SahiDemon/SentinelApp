@@ -61,6 +61,23 @@ body {
     border-color: var(--danger-color);
 }
 
+.container, .dashboard {
+    display: none;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.container.active, .dashboard.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.container.active {
+    display: flex;
+}
+
 .container {
     width: 100%;
     max-width: 320px;

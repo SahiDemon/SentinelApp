@@ -2,21 +2,28 @@ import { handleLogin as login, handleLogout as logout, getUserSecurityTier, getC
 import { notificationManager } from './notifications.js';
 const { ipcRenderer } = require('electron');
 
+// Key for storing dashboard state
+const DASHBOARD_STATE_KEY = 'sentinel_dashboard_state';
+
 async function handleLogin() {
     const username = document.getElementById('username') as HTMLInputElement;
     const password = document.getElementById('password') as HTMLInputElement;
     const rememberMe = document.getElementById('rememberMe') as HTMLInputElement;
+    const errorElement = document.getElementById('loginError')!;
+    errorElement.textContent = '';
     
     try {
         notificationManager.show('Login in progress...', 'info');
         const result = await login(username.value, password.value, rememberMe.checked);
         if (result.success) {
             notificationManager.show('Login successful', 'success');
-            document.getElementById('loginContainer')!.style.display = 'none';
-            document.getElementById('dashboard')!.style.display = 'block';
+            document.getElementById('loginContainer')!.classList.remove('active');
+            document.getElementById('dashboard')!.classList.add('active');
             
-            // Show loading overlay
-            (window as any).showDashboardLoadingOverlay();
+            // Show loading overlay only for fresh logins
+            if (!document.referrer.includes('index.html')) {
+                (window as any).showDashboardLoadingOverlay();
+            }
             
             // Set user email in greeting
             const user = await getCurrentUser();
@@ -25,13 +32,13 @@ async function handleLogin() {
             }
             
             await init();
+            sessionStorage.setItem(DASHBOARD_STATE_KEY, 'visible');
         } else {
             throw new Error(result.error);
         }
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Login failed';
         notificationManager.show(errorMessage, 'error');
-        const errorElement = document.getElementById('loginError')!;
         errorElement.textContent = errorMessage;
     }
 }
@@ -40,9 +47,10 @@ async function handleLogout() {
     try {
         notificationManager.show('Logging out...', 'info');
         await logout();
+        sessionStorage.removeItem(DASHBOARD_STATE_KEY);
         notificationManager.show('Logged out successfully', 'success');
-        document.getElementById('dashboard')!.style.display = 'none';
-        document.getElementById('loginContainer')!.style.display = 'flex';
+        document.getElementById('dashboard')!.classList.remove('active');
+        document.getElementById('loginContainer')!.classList.add('active');
         (document.getElementById('username') as HTMLInputElement).value = '';
         (document.getElementById('password') as HTMLInputElement).value = '';
         document.getElementById('loginError')!.textContent = '';
@@ -99,15 +107,36 @@ async function init() {
 // Check for existing session on startup
 async function checkSession() {
     try {
+        // Check if we're coming back from a refresh
+        const savedState = sessionStorage.getItem(DASHBOARD_STATE_KEY);
+        if (savedState === 'visible') {
+            document.getElementById('loginContainer')!.classList.remove('active');
+            document.getElementById('dashboard')!.classList.add('active');
+            const user = await getCurrentUser();
+            if (user?.email) {
+                document.getElementById('userEmail')!.textContent = user.email;
+            }
+            await init();
+            return;
+        }
+
         notificationManager.show('Checking session...', 'info');
         const user = await getCurrentUser();
         if (user) {
             notificationManager.show('Auto-login successful', 'success');
-            document.getElementById('loginContainer')!.style.display = 'none';
-            document.getElementById('dashboard')!.style.display = 'block';
+            document.getElementById('loginContainer')!.classList.remove('active');
+            document.getElementById('dashboard')!.classList.add('active');
+            sessionStorage.setItem(DASHBOARD_STATE_KEY, 'visible');
             
-            // Show loading overlay for auto-login
-            (window as any).showDashboardLoadingOverlay();
+            // Don't show overlay immediately, wait for splash screen signal
+            const showOverlay = () => {
+                (window as any).showDashboardLoadingOverlay();
+            };
+            
+            // If this is a fresh start (not a refresh), wait for splash screen
+            if (!document.referrer.includes('index.html')) {
+                ipcRenderer.once('splash-screen-done', showOverlay);
+            }
             
             document.getElementById('userEmail')!.textContent = user.email || '';
             await init();
@@ -115,13 +144,39 @@ async function checkSession() {
     } catch (error) {
         console.error('Session check failed:', error);
         notificationManager.show('Auto-login failed', 'error');
+        sessionStorage.removeItem(DASHBOARD_STATE_KEY);
     }
 }
 
+// Handle page reloads
+ipcRenderer.on('preserve-state', () => {
+    if (document.getElementById('dashboard')!.style.display === 'block') {
+        sessionStorage.setItem(DASHBOARD_STATE_KEY, 'visible');
+    } else {
+        sessionStorage.removeItem(DASHBOARD_STATE_KEY);
+    }
+});
+
 // Add event listeners when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Don't show any UI until we check the session
+    document.getElementById('loginContainer')!.classList.remove('active');
+    document.getElementById('dashboard')!.classList.remove('active');
+    
     // Check for existing session
-    checkSession();
+    await checkSession();
+    
+    // Only show login if no session was found
+    if (!sessionStorage.getItem(DASHBOARD_STATE_KEY)) {
+        // Wait for splash screen before showing login
+        if (!document.referrer.includes('index.html')) {
+            ipcRenderer.once('splash-screen-done', () => {
+                document.getElementById('loginContainer')!.classList.add('active');
+            });
+        } else {
+            document.getElementById('loginContainer')!.classList.add('active');
+        }
+    }
     
     // Login and logout buttons
     document.getElementById('loginButton')?.addEventListener('click', handleLogin);
@@ -138,7 +193,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('minimize-btn')?.addEventListener('click', () => {
         ipcRenderer.send('minimize-window');
     });
-
     document.getElementById('close-btn')?.addEventListener('click', () => {
         ipcRenderer.send('close-window');
     });

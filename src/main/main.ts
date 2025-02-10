@@ -98,6 +98,12 @@ function createMainWindow() {
     });
 
     mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
+
+    // Handle page reloads to preserve state
+    mainWindow.webContents.on('did-start-loading', () => {
+        mainWindow.webContents.send('preserve-state');
+    });
+
     return mainWindow;
 }
 
@@ -227,7 +233,8 @@ app.whenReady().then(() => {
     setTimeout(() => {
         splash.close();
         mainWindow?.show();
-    }, 1000);
+        mainWindow?.webContents.send('splash-screen-done');
+    }, 6000);
 
     mainWindow?.on('close', (event) => {
         if (!isQuitting) {
