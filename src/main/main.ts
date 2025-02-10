@@ -1,4 +1,4 @@
-import { app, BrowserWindow, protocol, ipcMain } from 'electron';
+import { app, BrowserWindow, protocol, ipcMain, Tray, Menu, nativeImage, dialog } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import os from 'os';
@@ -143,15 +143,98 @@ ipcMain.on('close-window', (event) => {
 // Handle the protocol launch for Windows
 app.setAsDefaultProtocolClient('sentinel');
 
+let tray: Tray | null = null;
+let isQuitting = false;
+let exitDialogWindow: BrowserWindow | null = null;
+
+function createTray() {
+    const iconPath = path.join(__dirname, '../assets/sentinalprime.png');
+    const icon = nativeImage.createFromPath(iconPath);
+    tray = new Tray(icon.resize({ width: 16, height: 16 }));
+
+    const contextMenu = Menu.buildFromTemplate([
+        {
+            label: 'Open',
+            click: () => {
+                if (mainWindow) {
+                    mainWindow.show();
+                }
+            }
+        },
+        {
+            label: 'Exit',
+            click: () => {
+                showExitConfirmation();
+            }
+        }
+    ]);
+
+    tray.setToolTip('Sentinel App');
+    tray.setContextMenu(contextMenu);
+}
+
+function showExitConfirmation() {
+    if (exitDialogWindow) {
+        exitDialogWindow.focus();
+        return;
+    }
+
+    exitDialogWindow = new BrowserWindow({
+        width: 400,
+        height: 320,
+        resizable: false,
+        frame: false,
+        transparent: true,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
+        },
+        parent: mainWindow || undefined,
+        modal: true,
+        show: false
+    });
+
+    exitDialogWindow.loadFile(path.join(__dirname, '../renderer/exitDialog.html'));
+
+    exitDialogWindow.once('ready-to-show', () => {
+        exitDialogWindow?.show();
+    });
+
+    exitDialogWindow.on('closed', () => {
+        exitDialogWindow = null;
+    });
+}
+
+ipcMain.on('exit-dialog-response', (_, shouldExit: boolean) => {
+    if (shouldExit) {
+        isQuitting = true;
+        if (mainWindow) {
+            mainWindow.destroy();
+        }
+        app.quit();
+    }
+    exitDialogWindow?.close();
+});
+
+let mainWindow: BrowserWindow | null = null;
+
 app.whenReady().then(() => {
+    createTray();
     const splash = createSplashScreen();
-    const mainWindow = createMainWindow();
+    mainWindow = createMainWindow();
 
     // Simulate initialization process
     setTimeout(() => {
         splash.close();
-        mainWindow.show();
+        mainWindow?.show();
     }, 7000);
+
+    mainWindow?.on('close', (event) => {
+        if (!isQuitting) {
+            event.preventDefault();
+            mainWindow?.hide();
+        }
+    });
 
     app.on('window-all-closed', () => {
         if (process.platform !== 'darwin') {
@@ -163,5 +246,9 @@ app.whenReady().then(() => {
         if (BrowserWindow.getAllWindows().length === 0) {
             createMainWindow();
         }
+    });
+
+    app.on('before-quit', () => {
+        isQuitting = true;
     });
 });
