@@ -1,0 +1,333 @@
+/* Theme Variables */
+.theme-cyberpunk {
+    --primary: #00a8ff;
+    --primary-glow: rgba(0, 168, 255, 0.5);
+    --background: #000913;
+    --surface: #001529;
+    --card-bg: rgba(0, 21, 41, 0.7);
+    --text-primary: #fff;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --accent: #00ff9d;
+    --accent-glow: rgba(0, 255, 157, 0.5);
+    --error: #ff4757;
+    --success: #2ed573;
+    --warning: #ffa502;
+    --border-color: rgba(0, 168, 255, 0.3);
+    --cyber-glow: 0 0 10px rgba(0, 168, 255, 0.3);
+    --font-display: 'Orbitron', sans-serif;
+}
+
+.theme-midnight {
+    --primary: #7c3aed;
+    --primary-glow: rgba(124, 58, 237, 0.5);
+    --background: #0f172a;
+    --surface: #1e293b;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --accent: #06b6d4;
+    --accent-glow: rgba(6, 182, 212, 0.5);
+    --error: #ef4444;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --border-color: rgba(124, 58, 237, 0.2);
+    --cyber-glow: 0 0 10px rgba(124, 58, 237, 0.3);
+    --font-display: 'Inter', sans-serif;
+}
+
+.theme-professional {
+    /* Primary Colors */
+    --primary: #0052cc;
+    --primary-glow: rgba(0, 82, 204, 0.15);
+    --background: #ffffff;
+    --surface: #f7f9fc;
+    --card-bg: #ffffff;
+    --text-primary: #172b4d;
+    --text-secondary: #5e6c84;
+    --accent: #36b37e;
+    --accent-glow: rgba(54, 179, 126, 0.15);
+    --error: #de350b;
+    --success: #36b37e;
+    --warning: #ffab00;
+    --border-color: #dfe1e6;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --cyber-glow: none;
+    --font-display: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Professional Theme Overrides */
+.theme-professional .security-card,
+.theme-professional .system-status-card,
+.theme-professional .info-item {
+    background: white;
+    backdrop-filter: none;
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    box-shadow: var(--shadow);
+}
+
+.theme-professional .security-card {
+    padding: 16px;
+    margin: 12px;
+    
+}
+
+.theme-professional .system-status-card {
+    padding: 16px;
+    margin: 12px;
+}
+
+.theme-professional .info-item {
+    padding: 12px;
+    background: var(--surface);
+}
+
+.theme-professional .tier {
+    color: var(--success);
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    text-shadow: none;
+    letter-spacing: 0;
+}
+
+.theme-professional .tier::before {
+    display: none;
+}
+
+.theme-professional .status-description {
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--text-secondary);
+}
+
+.theme-professional .system-status-card h3 {
+    color: var(--primary);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    text-transform: none;
+    letter-spacing: 0;
+    text-shadow: none;
+}
+
+.theme-professional .info-item label {
+    color: var(--text-secondary);
+    font-size: 11px;
+    margin-bottom: 4px;
+}
+
+.theme-professional .info-item div {
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* Dashboard Styles */
+.theme-professional .dashboard {
+    background: var(--background);
+    padding: 12px;
+}
+
+.theme-professional .dashboard-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px;
+}
+
+.theme-professional .status-badge {
+    background: var(--primary);
+    color: white;
+    font-family: var(--font-display);
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+.theme-professional .user-greeting {
+    font-family: var(--font-display);
+}
+
+.theme-professional .greeting-text {
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.theme-professional .user-email {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.theme-professional .logout-btn {
+    background: white;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+}
+
+.theme-professional .logout-btn:hover {
+    background: var(--surface);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* Security Card */
+.theme-professional .security-card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    padding: 16px;
+    margin: 12px;
+    box-shadow: var(--shadow);
+    margin-top: -12px;
+}
+
+.theme-professional .security-status {
+    background: white !important;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    padding: 0;
+    margin: 0;
+}
+
+.theme-professional .tier {
+    color: var(--success);
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    text-shadow: none;
+}
+
+.theme-professional .tier::before {
+    display: none;
+}
+
+.theme-professional .status-description {
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.4;
+    max-width: none;
+}
+
+/* System Status Card */
+.theme-professional .system-status-card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    padding: 16px;
+    margin: 12px;
+    box-shadow: var(--shadow);
+}
+
+.theme-professional .system-status-card h3 {
+    color: var(--primary);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 12px;
+}
+
+.theme-professional .system-info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.theme-professional .info-item {
+    text-align: center;
+    padding: 12px;
+    background: var(--surface);
+    border-radius: 3px;
+    border: 1px solid var(--border-color);
+}
+
+.theme-professional .info-item label {
+    color: var(--text-secondary);
+    font-size: 11px;
+    display: block;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.theme-professional .info-item div {
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.theme-dark {
+    --primary: #546e7a;
+    --primary-glow: rgba(84, 110, 122, 0.5);
+    --background: #263238;
+    --surface: rgba(38, 50, 56, 0.9);
+    --border-color: rgba(84, 110, 122, 0.3);
+    --text-primary: #eceff1;
+    --text-secondary: rgba(236, 239, 241, 0.7);
+    --accent: #80cbc4;
+    --accent-glow: rgba(128, 203, 196, 0.5);
+    --error: #ef5350;
+    --success: #66bb6a;
+    --warning: #ffca28;
+    --font-display: 'Roboto', sans-serif;
+    --shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Cyberpunk Theme Overrides */
+.theme-cyberpunk .security-card,
+.theme-cyberpunk .system-status-card {
+    background: rgba(0, 21, 41, 0.8);
+    border-color: rgba(0, 168, 255, 0.3);
+}
+
+.theme-cyberpunk .info-item {
+    background: rgba(0, 21, 41, 0.8);
+    border-color: rgba(0, 168, 255, 0.3);
+    transition: all 0.2s ease;
+}
+
+.theme-cyberpunk .info-item:hover {
+    border-color: var(--primary);
+    box-shadow: var(--cyber-glow);
+}
+
+.theme-cyberpunk .user-email,
+.theme-cyberpunk .status-description,
+.theme-cyberpunk .info-item div {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.theme-cyberpunk .system-status-card h3 {
+    color: var(--primary);
+    text-shadow: 0 0 8px var(--primary-glow);
+}
+
+.theme-cyberpunk .info-item label {
+    color: var(--primary);
+    text-shadow: 0 0 8px var(--primary-glow);
+}
+
+/* Apply theme variables to root */
+:root {
+    --primary: var(--theme-primary);
+    --primary-glow: var(--theme-primary-glow);
+    --background: var(--theme-background);
+    --surface: var(--theme-surface);
+    --border-color: var(--theme-border-color);
+    --text-primary: var(--theme-text-primary);
+    --text-secondary: var(--theme-text-secondary);
+    --accent: var(--theme-accent);
+    --accent-glow: var(--theme-accent-glow);
+    --error: var(--theme-error);
+    --success: var(--theme-success);
+    --warning: var(--theme-warning);
+    --font-display: var(--theme-font-display);
+    --shadow: var(--theme-shadow);
+}

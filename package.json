@@ -7,7 +7,7 @@
   "scripts": {
     "start": "npm run build && electron . --enable-logging",
     "watch": "tsc -w",
-    "build": "npm run clean && node build.js && copyfiles -u 1 \"src/renderer/**/*.html\" dist/",
+    "build": "npm run clean && node build.js && copyfiles -u 1 \"src/renderer/**/*.{html,css}\" dist/",
     "dist": "npm run build && electron-builder",
     "clean": "rimraf dist",
     "test": "echo \"Error: no test specified\" && exit 1",

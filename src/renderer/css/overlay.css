@@ -1,3 +1,4 @@
+/* Base overlay styles */
 .loading-overlay {
     position: fixed;
     top: 0;
@@ -183,4 +184,94 @@
         transform: scale(0.95);
         opacity: 0.5;
     }
+}
+
+/* Professional theme overlay styles */
+.theme-professional .loading-overlay {
+    background: #ffffff;
+    color: var(--text-primary);
+}
+
+.theme-professional .loading-overlay::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, 
+        rgba(37, 99, 235, 0.03) 25%, 
+        transparent 25%, 
+        transparent 50%, 
+        rgba(37, 99, 235, 0.03) 50%, 
+        rgba(37, 99, 235, 0.03) 75%, 
+        transparent 75%);
+    background-size: 4px 4px;
+    opacity: 0.5;
+}
+
+.theme-professional .loading-content {
+    gap: 48px;
+}
+
+.theme-professional .logo-container {
+    width: 140px;
+    height: 140px;
+}
+
+.theme-professional .logo-container::after {
+    border: 2px solid rgba(37, 99, 235, 0.2);
+    border-radius: 12px;
+}
+
+.theme-professional .loading-line {
+    width: 320px;
+    height: 4px;
+    background: #f0f5ff;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.theme-professional .loading-line::before {
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(37, 99, 235, 0.2), 
+        transparent);
+}
+
+.theme-professional .loading-line::after {
+    background: #2563eb;
+}
+
+.theme-professional .loading-text {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--text-primary);
+}
+
+.theme-professional .loading-text.system-operational {
+    color: #059669;
+    text-shadow: none;
+    font-weight: 600;
+}
+
+@keyframes professionalPulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.02);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+}
+
+.theme-professional .loading-text.system-operational {
+    animation: professionalPulse 2s ease-in-out infinite;
 }

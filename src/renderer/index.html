@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Sentinel Security</title>
     <link rel="stylesheet" href="./css/styles.css">
-    <link rel="stylesheet" href="./css/overlay.css">
     <link rel="stylesheet" href="./css/notifications.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="./css/overlay.css">
+    <link rel="stylesheet" href="./css/themes.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
+<body class="theme-cyberpunk">
     <div class="window-controls">
         <button id="minimize-btn">-</button>
         <button id="close-btn">×</button>
@@ -19,13 +25,15 @@
                 <img src="../assets/sentinalprime.png" alt="Sentinel Security">
             </div>
             <div class="app-title">Sentinel Security</div>
-            <div class="form-group">
-                <label for="username">Email</label>
-                <input type="email" id="username" name="username" required>
+            <div class="input-group">
+                <input type="email" id="username" name="username" placeholder="Email" required>
+                <div class="email-suffix">@gmail.com</div>
             </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
+            <div class="input-group">
+                <input type="password" id="password" name="password" placeholder="Password" required>
+                <button type="button" id="togglePassword" class="password-toggle">
+                    <i class="fas fa-eye"></i>
+                </button>
             </div>
             <div class="checkbox-group">
                 <input type="checkbox" id="rememberMe" name="rememberMe">
@@ -77,6 +85,31 @@
                     <div><span id="storage-info">Analyzing...</span></div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="theme-switcher">
+        <button id="theme-switcher-toggle" class="theme-button">
+            <i class="fas fa-paint-brush"></i>
+            <span>Switch Theme</span>
+        </button>
+        <div id="theme-buttons" class="theme-buttons">
+            <button class="theme-button active" data-theme="cyberpunk">
+                <i class="fas fa-robot"></i>
+                <span>Cyberpunk</span>
+            </button>
+            <button class="theme-button" data-theme="midnight">
+                <i class="fas fa-moon"></i>
+                <span>Midnight</span>
+            </button>
+            <button class="theme-button" data-theme="professional">
+                <i class="fas fa-briefcase"></i>
+                <span>Professional</span>
+            </button>
+            <button class="theme-button" data-theme="dark">
+                <i class="fas fa-circle-half-stroke"></i>
+                <span>Dark</span>
+            </button>
         </div>
     </div>
 
