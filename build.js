@@ -19,6 +19,11 @@ async function copyAssets() {
             path.join(__dirname, 'dist', 'renderer', 'css', 'styles.css')
         );
         
+        await fs.copyFile(
+            path.join(__dirname, 'src', 'renderer', 'css', 'notifications.css'),
+            path.join(__dirname, 'dist', 'renderer', 'css', 'notifications.css')
+        );
+        
         // Copy all files from src/assets to dist/assets if the directory exists
         try {
             const files = await fs.readdir(path.join(__dirname, 'src', 'assets'));
@@ -34,6 +39,18 @@ async function copyAssets() {
             }
             console.log('No assets directory found, skipping asset copy');
         }
+
+        // Copy overlay.css
+        await fs.copyFile(
+            path.join(__dirname, 'src', 'renderer', 'css', 'overlay.css'),
+            path.join(__dirname, 'dist', 'renderer', 'css', 'overlay.css')
+        );
+
+        // Copy overlay.js
+        await fs.copyFile(
+            path.join(__dirname, 'src', 'renderer', 'js', 'overlay.js'),
+            path.join(__dirname, 'dist', 'renderer', 'js', 'overlay.js')
+        );
         
         console.log('Assets and CSS copied successfully');
     } catch (error) {
@@ -69,7 +86,8 @@ async function build() {
         await esbuild.build({
             entryPoints: [
                 path.join(__dirname, 'src/renderer/js/auth.ts'),
-                path.join(__dirname, 'src/renderer/js/index.ts')
+                path.join(__dirname, 'src/renderer/js/index.ts'),
+                path.join(__dirname, 'src/renderer/js/notifications.ts')
             ],
             bundle: true,
             platform: 'browser',

@@ -227,7 +227,7 @@ app.whenReady().then(() => {
     setTimeout(() => {
         splash.close();
         mainWindow?.show();
-    }, 7000);
+    }, 1000);
 
     mainWindow?.on('close', (event) => {
         if (!isQuitting) {

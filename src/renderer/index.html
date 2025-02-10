@@ -3,6 +3,8 @@
 <head>
     <title>Sentinel Security</title>
     <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/overlay.css">
+    <link rel="stylesheet" href="./css/notifications.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap">
 </head>
 <body>
@@ -79,5 +81,14 @@
     </div>
 
     <script type="module" src="./js/index.js"></script>
+    <script type="module">
+        import LoadingOverlay from './js/overlay.js';
+        
+        // Make the function available globally
+        window.showDashboardLoadingOverlay = () => {
+            const loadingOverlay = new LoadingOverlay();
+            loadingOverlay.start();
+        };
+    </script>
 </body>
 </html>

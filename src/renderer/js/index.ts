@@ -1,4 +1,5 @@
 import { handleLogin as login, handleLogout as logout, getUserSecurityTier, getCurrentUser } from './auth.js';
+import { notificationManager } from './notifications.js';
 const { ipcRenderer } = require('electron');
 
 async function handleLogin() {
@@ -7,10 +8,15 @@ async function handleLogin() {
     const rememberMe = document.getElementById('rememberMe') as HTMLInputElement;
     
     try {
+        notificationManager.show('Login in progress...', 'info');
         const result = await login(username.value, password.value, rememberMe.checked);
         if (result.success) {
+            notificationManager.show('Login successful', 'success');
             document.getElementById('loginContainer')!.style.display = 'none';
             document.getElementById('dashboard')!.style.display = 'block';
+            
+            // Show loading overlay
+            (window as any).showDashboardLoadingOverlay();
             
             // Set user email in greeting
             const user = await getCurrentUser();
@@ -23,18 +29,26 @@ async function handleLogin() {
             throw new Error(result.error);
         }
     } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Login failed';
+        notificationManager.show(errorMessage, 'error');
         const errorElement = document.getElementById('loginError')!;
-        errorElement.textContent = error instanceof Error ? error.message : 'Login failed';
+        errorElement.textContent = errorMessage;
     }
 }
 
 async function handleLogout() {
-    await logout();
-    document.getElementById('dashboard')!.style.display = 'none';
-    document.getElementById('loginContainer')!.style.display = 'flex';
-    (document.getElementById('username') as HTMLInputElement).value = '';
-    (document.getElementById('password') as HTMLInputElement).value = '';
-    document.getElementById('loginError')!.textContent = '';
+    try {
+        notificationManager.show('Logging out...', 'info');
+        await logout();
+        notificationManager.show('Logged out successfully', 'success');
+        document.getElementById('dashboard')!.style.display = 'none';
+        document.getElementById('loginContainer')!.style.display = 'flex';
+        (document.getElementById('username') as HTMLInputElement).value = '';
+        (document.getElementById('password') as HTMLInputElement).value = '';
+        document.getElementById('loginError')!.textContent = '';
+    } catch (error) {
+        notificationManager.show('Logout failed', 'error');
+    }
 }
 
 async function fetchSystemInfo() {
@@ -85,15 +99,22 @@ async function init() {
 // Check for existing session on startup
 async function checkSession() {
     try {
+        notificationManager.show('Checking session...', 'info');
         const user = await getCurrentUser();
         if (user) {
+            notificationManager.show('Auto-login successful', 'success');
             document.getElementById('loginContainer')!.style.display = 'none';
             document.getElementById('dashboard')!.style.display = 'block';
+            
+            // Show loading overlay for auto-login
+            (window as any).showDashboardLoadingOverlay();
+            
             document.getElementById('userEmail')!.textContent = user.email || '';
             await init();
         }
     } catch (error) {
         console.error('Session check failed:', error);
+        notificationManager.show('Auto-login failed', 'error');
     }
 }
 
