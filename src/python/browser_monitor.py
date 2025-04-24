@@ -13,13 +13,9 @@ import requests
 from datetime import datetime, timezone
 from urllib.parse import unquote, parse_qs, urlparse
 import urllib3
+from opensearch_logger import OpenSearchLogger
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-
-# OpenSearch Configuration
-OPENSEARCH_URL = "https://localhost:9200/browser_history/_doc"
-AUTH = ("admin", "Sahi_448866")  # OpenSearch Username & Password
-HEADERS = {"Content-Type": "application/json"}
 
 def setup_logger(name, log_dir="logs"):
     """Set up a JSON logger"""
@@ -50,9 +46,15 @@ def setup_logger(name, log_dir="logs"):
     return logger
 
 class BrowserMonitor:
-    def __init__(self, log_dir="logs"):
+    def __init__(self, log_dir="logs", electron_user_id=None):
         """Initialize browser monitor"""
         self.logger = setup_logger('browser_monitor', log_dir)
+        self.opensearch_logger = OpenSearchLogger(electron_user_id=electron_user_id)
+        self.logger.info({"message": "Browser Monitor initialized. Attempting to connect to OpenSearch..."})
+        if not self.opensearch_logger.client:
+            self.logger.warning({"message": "Failed to connect to OpenSearch. Logs will not be sent."})
+        else:
+            self.logger.info({"message": "OpenSearch connection successful."})
 
         self.browsers = {
             'chrome.exe': {'name': 'Google Chrome', 'history_path': os.path.expandvars(r'%LOCALAPPDATA%\Google\Chrome\User Data\Default\History')},
@@ -142,26 +144,28 @@ class BrowserMonitor:
         if not self._should_log(browser_name, activity_type, parsed_url):
             return  # Prevent duplicate logging
         
-        log_data = {
+        file_log_data = {
             'timestamp': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
             'browser': browser_name,
             'activity_type': activity_type,
             'url': parsed_url,
             'title': title if title else ''
         }
-        self.logger.info(log_data)
+        self.logger.info(file_log_data)
 
-        # Send log to OpenSearch
-        self._send_to_opensearch(log_data)
-
-    def _send_to_opensearch(self, log_data):
-        """Send log to OpenSearch"""
-        try:
-            response = requests.post(OPENSEARCH_URL, auth=AUTH, json=log_data, headers=HEADERS, verify=False)
-            if response.status_code not in [200, 201]:
-                print(f"Failed to send log: {response.text}")
-        except requests.exceptions.RequestException as e:
-            print(f"OpenSearch connection error: {str(e)}")
+        if self.opensearch_logger.client:
+            event_details = {
+                "browser": browser_name,
+                "activity_type": activity_type,
+                "url": parsed_url,
+                "title": title if title else ''
+            }
+            event_details = {k: v for k, v in event_details.items() if v is not None}
+            self.opensearch_logger.log(
+                monitor_type="browser_monitor",
+                event_type="browser_history_added",
+                event_details=event_details
+            )
 
     def _detect_browsers(self):
         """Detects running browsers and updates active list"""

@@ -16,15 +16,7 @@ from datetime import datetime, timezone
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from pathlib import Path
-
-# OpenSearch configuration
-OPENSEARCH_HOST = "https://localhost:9200"
-OPENSEARCH_INDEX = "file_monitor"
-AUTH = ("admin", "Sahi_448866")
-HEADERS = {"Content-Type": "application/json"}
-
-# Disable SSL warnings for self-signed certs
-urllib3.disable_warnings()
+from opensearch_logger import OpenSearchLogger
 
 def setup_logger(name, log_dir=None):
     logger = logging.getLogger(name)
@@ -54,8 +46,14 @@ def is_admin():
         return False
 
 class UserFileMonitor:
-    def __init__(self, log_dir=None):
+    def __init__(self, log_dir=None, electron_user_id=None):
         self.logger = setup_logger('user_file_monitor')
+        self.opensearch_logger = OpenSearchLogger(electron_user_id=electron_user_id)
+        self.logger.info("FileSystem Monitor initialized. Attempting to connect to OpenSearch...")
+        if not self.opensearch_logger.client:
+            self.logger.warning("Failed to connect to OpenSearch. Logs will not be sent.")
+        else:
+            self.logger.info("OpenSearch connection successful.")
         
         # Add recycling bin paths to ignore
         self.ignore_patterns = {
@@ -140,17 +138,6 @@ class UserFileMonitor:
         self.logger.debug("FileMonitor initialized")
         self.logger.info("Monitoring system starting...")
 
-        # Initialize OpenSearch session with retries
-        self.session = requests.Session()
-        retries = Retry(total=3, backoff_factor=0.1)
-        self.session.mount('https://', HTTPAdapter(max_retries=retries))
-        self.session.verify = False  # Skip SSL verification
-        self.session.auth = AUTH
-        self.session.headers.update(HEADERS)
-
-        # Initialize OpenSearch
-        self.setup_opensearch()
-
         # Add throttling for frequently modified files
         self.last_modification_time = {}  # {file_path: last_time}
         self.modification_cooldown = 5  # seconds between modifications
@@ -232,84 +219,6 @@ class UserFileMonitor:
             'firefox': r'.*\\Mozilla\\Firefox\\.*',
         }
         
-    def setup_opensearch(self):
-        """Setup OpenSearch index with visualization-friendly mapping"""
-        try:
-            mapping = {
-                "mappings": {
-                    "properties": {
-                        "timestamp": {"type": "date"},
-                        "event_type": {
-                            "type": "text",
-                            "fielddata": True,
-                            "fields": {
-                                "raw": {"type": "keyword"}
-                            }
-                        },
-                        "file_path": {
-                            "type": "text",
-                            "fielddata": True,
-                            "fields": {
-                                "raw": {"type": "keyword"}
-                            }
-                        },
-                        "file_name": {
-                            "type": "text",
-                            "fielddata": True,
-                            "fields": {
-                                "raw": {"type": "keyword"}
-                            }
-                        },
-                        "directory": {
-                            "type": "text",
-                            "fielddata": True,
-                            "fields": {
-                                "raw": {"type": "keyword"}
-                            }
-                        },
-                        "host": {
-                            "type": "keyword"
-                        },
-                        "operation": {
-                            "type": "keyword"
-                        },
-                        "file_count": {
-                            "type": "integer"
-                        },
-                        "details": {
-                            "type": "object",
-                            "properties": {
-                                "operation": {"type": "keyword"},
-                                "file_count": {"type": "integer"},
-                                "file_size": {"type": "long"},
-                                "is_sensitive": {"type": "boolean"},
-                                "category": {"type": "keyword"}
-                            }
-                        }
-                    }
-                }
-            }
-
-            # Delete existing index if exists
-            try:
-                self.session.delete(f"{OPENSEARCH_HOST}/{OPENSEARCH_INDEX}")
-            except:
-                pass
-
-            # Create new index with mapping
-            response = self.session.put(
-                f"{OPENSEARCH_HOST}/{OPENSEARCH_INDEX}",
-                json=mapping
-            )
-            
-            if response.status_code not in (200, 201):
-                print(f"Failed to create index: {response.text}")
-            else:
-                print("OpenSearch index created successfully")
-                
-        except Exception as e:
-            print(f"Error setting up OpenSearch: {str(e)}")
-
     def get_file_hash(self, path):
         """Get hash of first 8KB of file to detect changes"""
         try:
@@ -455,117 +364,22 @@ class UserFileMonitor:
         self.recent_alerts.append((current_time, path, event_type))
         return True
 
-    def send_to_opensearch(self, event_type, file_path, details=None):
-        """Send event with visualization-friendly structure"""
-        try:
-            # Get file info
-            file_name = os.path.basename(file_path)
-            directory = os.path.dirname(file_path)
-            
-            # Determine file category
-            category = "other"
-            ext = os.path.splitext(file_name)[1].lower()
-            if ext in {'.pdf', '.doc', '.docx', '.xls', '.xlsx'}:
-                category = "document"
-            elif ext in {'.jpg', '.png', '.gif'}:
-                category = "image"
-            elif ext in {'.py', '.js', '.java', '.cpp'}:
-                category = "code"
-            
-            # Build details dictionary properly
-            details_dict = {}
-            if details:
-                details_dict.update(details)
-                
-            details_dict.update({
-                "category": category,
-                "is_sensitive": self.is_sensitive_file(file_path),
-                "file_size": os.path.getsize(file_path) if os.path.exists(file_path) else 0
-            })
-            
-            # Build event data
-            event_data = {
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-                "event_type": event_type,
-                "file_path": file_path,
-                "file_name": file_name,
-                "directory": directory,
-                "host": os.environ.get('COMPUTERNAME', 'unknown'),
-                "operation": event_type.split('.')[0],  # 'file', 'folder', etc
-                "file_count": details_dict.get('file_count', 1),
-                "details": details_dict
-            }
-            
-            # Send to OpenSearch
-            response = self.session.post(
-                f"{OPENSEARCH_HOST}/{OPENSEARCH_INDEX}/_doc",
-                json=event_data,
-                timeout=5,
-                verify=False
-            )
-            
-            # Enhanced response logging
-            print("\nOpenSearch Response:")
-            print("-" * 50)
-            print(f"Status Code: {response.status_code}")
-            try:
-                resp_json = response.json()
-                print(f"Index: {resp_json.get('_index')}")
-                print(f"Document ID: {resp_json.get('_id')}")
-                print(f"Result: {resp_json.get('result')}")
-                if 'error' in resp_json:
-                    print("Error Details:")
-                    print(json.dumps(resp_json['error'], indent=2))
-            except Exception as e:
-                print(f"Raw Response: {response.text}")
-            print("-" * 50)
-            
-            return response.status_code in (200, 201)
-                
-        except Exception as e:
-            print(f"OpenSearch Error: {str(e)}")
-            return False
-
     def log_bulk_operation(self, operation_type, path):
-        """Improved bulk file operations logging"""
-        try:
-            current_time = time.time()
-            parent_dir = os.path.dirname(path)
-            
-            # Clean old operations
-            self.recent_operations[parent_dir][operation_type] = [
-                (t, p) for t, p in self.recent_operations[parent_dir][operation_type]
-                if current_time - t <= self.operation_window
-            ]
-            
-            # Add new operation with path tracking
-            self.recent_operations[parent_dir][operation_type].append((current_time, path))
-            
-            # Check if enough time has passed since last alert
-            if current_time - self.last_bulk_alert[parent_dir] < self.bulk_alert_cooldown:
-                return
-                
-            # Get unique files in the time window
-            unique_files = set(p for _, p in self.recent_operations[parent_dir][operation_type])
-            if len(unique_files) >= self.bulk_threshold:
-                self.logger.warning(
-                    f"Multiple {operation_type} operations in {parent_dir}:\n"
-                    f"- Affected files ({len(unique_files)}):\n"
-                    f"- {', '.join(os.path.basename(p) for p in list(unique_files)[:5])}"
-                    + (" ..." if len(unique_files) > 5 else "")
-                )
-                details = {
-                    "operation": operation_type,
-                    "file_count": len(unique_files),
-                    "affected_files": [os.path.basename(p) for p in list(unique_files)[:5]]
-                }
-                self.send_to_opensearch("bulk_operation", parent_dir, details)
-                # Clear operations and update last alert time
-                self.recent_operations[parent_dir][operation_type].clear()
-                self.last_bulk_alert[parent_dir] = current_time
-                
-        except Exception as e:
-            self.logger.error(f"Error in bulk operation logging: {str(e)}")
+        """Log bulk file operation"""
+        if not self.opensearch_logger.client: return
+        
+        dir_path = os.path.dirname(path)
+        details = {
+            "operation_type": operation_type,
+            "directory": dir_path,
+            "file_count": len(self.bulk_tracking['operations'][dir_path][operation_type])
+        }
+        self.opensearch_logger.log(
+            monitor_type="filesystem_monitor",
+            event_type=f"bulk_{operation_type}",
+            event_details=details
+        )
+        self.logger.info(f"Bulk {operation_type} detected in: {dir_path}")
 
     def log_folder_deletion(self, folder_path):
         """Log folder deletion with intelligent summary"""
@@ -598,6 +412,14 @@ class UserFileMonitor:
             )
             
             self.deleted_folders[folder_path] = time.time()
+            
+            details = {"deleted_path": folder_path}
+            self.logger.warning(f"Potential folder deletion: {folder_path}")
+            self.opensearch_logger.log(
+                monitor_type="filesystem_monitor",
+                event_type="folder_deleted",
+                event_details=details
+            )
             
         except Exception as e:
             self.logger.error(f"Error logging folder deletion: {str(e)}")
@@ -699,39 +521,41 @@ class UserFileMonitor:
         """Check if operation is related to recycle bin"""
         return any(re.match(pattern, path, re.IGNORECASE) for pattern in self.recycle_bin_patterns)
 
-    def handle_bulk_operation(self, operation_type, path):
-        """Smart bulk operation handling"""
-        current_time = time.time()
+    def handle_bulk_operation(self, operation_type, file_path):
+        """Handle and log bulk operations more robustly"""
+        if not self.opensearch_logger.client: return
+
+        directory = os.path.dirname(file_path)
+        now = time.time()
         
-        # Clean old operations
-        self.bulk_operation_cache[operation_type] = [
-            (ts, p) for ts, p in self.bulk_operation_cache[operation_type]
-            if current_time - ts <= self.bulk_window
-        ]
+        # Check cooldown
+        last_bulk_time = self.bulk_tracking['cooldown'].get(directory, 0)
+        if now - last_bulk_time < self.bulk_tracking['window']:
+            return True  # Still in bulk operation mode
         
-        # Add new operation
-        self.bulk_operation_cache[operation_type].append((current_time, path))
-        
-        # Check for bulk operation
-        recent_ops = self.bulk_operation_cache[operation_type]
-        if len(recent_ops) >= self.bulk_count_threshold:
-            # Group by directory
-            dir_groups = defaultdict(list)
-            for _, file_path in recent_ops:
-                dir_groups[os.path.dirname(file_path)].append(file_path)
+        # Get all recent operations
+        recent_ops = self.bulk_tracking['operations'][directory][operation_type]
+        if len(recent_ops) >= self.bulk_tracking['threshold']:
+            # Send bulk event
+            details = {
+                "directory": directory,
+                "operation": operation_type,
+                "file_count": len(recent_ops),
+                "files_involved": [p for t, p in recent_ops] # Log specific files
+            }
             
-            # Report bulk operations by directory
-            for dir_path, files in dir_groups.items():
-                if len(files) >= self.bulk_count_threshold:
-                    details = {
-                        "operation": operation_type,
-                        "file_count": len(files),
-                        "sample_files": [os.path.basename(p) for p in files[:5]]
-                    }
-                    self.send_to_opensearch(f"bulk_{operation_type}", dir_path, details)
-                    
-            # Clear cache after reporting
-            self.bulk_operation_cache[operation_type].clear()
+            self.opensearch_logger.log(
+                monitor_type="filesystem_monitor",
+                event_type=f"bulk_{operation_type}_detected",
+                event_details=details
+            )
+            self.bulk_tracking['cooldown'][directory] = now
+            self.logger.warning(f"BULK {operation_type} detected in {directory} ({len(recent_ops)} files)")
+            # Clear tracked operations
+            self.bulk_tracking['operations'][directory][operation_type].clear()
+            return True
+            
+        return False
 
     def is_bulk_operation(self, operation_type, file_path):
         """Check if this is part of a bulk operation"""
@@ -754,43 +578,11 @@ class UserFileMonitor:
         except:
             return False
 
-    def handle_bulk_operation(self, operation_type, file_path):
-        """Handle bulk operations smartly"""
-        try:
-            directory = os.path.dirname(file_path)
-            current_time = time.time()
-            
-            # Check cooldown
-            last_bulk_time = self.bulk_tracking['cooldown'].get(directory, 0)
-            if current_time - last_bulk_time < self.bulk_tracking['window']:
-                return True  # Still in bulk operation mode
-            
-            # Get all recent operations
-            recent_ops = self.bulk_tracking['operations'][directory][operation_type]
-            if len(recent_ops) >= self.bulk_tracking['threshold']:
-                # Send bulk event
-                details = {
-                    "operation": operation_type,
-                    "file_count": len(recent_ops),
-                    "first_file": os.path.basename(recent_ops[0][1]),
-                    "last_file": os.path.basename(recent_ops[-1][1]),
-                    "sample_files": [os.path.basename(p) for _, p in recent_ops[:5]]
-                }
-                
-                self.send_to_opensearch(f"bulk_{operation_type}", directory, details)
-                self.bulk_tracking['cooldown'][directory] = current_time
-                
-                # Clear tracked operations
-                self.bulk_tracking['operations'][directory][operation_type].clear()
-                return True
-                
-            return False
-        except:
-            return False
-
 class UserFileHandler(FileSystemEventHandler):
     def __init__(self, monitor):
         self.monitor = monitor
+        self.opensearch_logger = monitor.opensearch_logger
+        self.logger = monitor.logger
         self.bulk_operation_cache = defaultdict(dict)  # {directory: {operation_type: last_bulk_time}}
 
     def is_in_bulk_cooldown(self, directory, operation_type):
@@ -825,7 +617,16 @@ class UserFileHandler(FileSystemEventHandler):
         # Only send individual event if not in bulk mode
         if self.monitor.is_significant_change(event.src_path):
             print(f"\nFile modification detected: {event.src_path}")
-            self.monitor.send_to_opensearch("file.modified", event.src_path)
+            if self.opensearch_logger.client:
+                event_details = {
+                    "file_path": event.src_path,
+                    "file_name": os.path.basename(event.src_path),
+                }
+                self.opensearch_logger.log(
+                    monitor_type="filesystem_monitor",
+                    event_type="file_modified",
+                    event_details=event_details
+                )
 
     def on_deleted(self, event):
         if (self.monitor.is_system_file(event.src_path) or  # Check system files first
@@ -846,10 +647,28 @@ class UserFileHandler(FileSystemEventHandler):
         # Only send individual event if not in bulk mode
         if not event.is_directory:
             print(f"\nFile deletion detected: {event.src_path}")
-            self.monitor.send_to_opensearch("file.deleted", event.src_path)
+            if self.opensearch_logger.client:
+                event_details = {
+                    "file_path": event.src_path,
+                    "file_name": os.path.basename(event.src_path),
+                }
+                self.opensearch_logger.log(
+                    monitor_type="filesystem_monitor",
+                    event_type="file_deleted",
+                    event_details=event_details
+                )
         else:
             print(f"\nFolder deletion detected: {event.src_path}")
-            self.monitor.send_to_opensearch("folder.deleted", event.src_path)
+            if self.opensearch_logger.client:
+                event_details = {
+                    "folder_path": event.src_path,
+                    "folder_name": os.path.basename(event.src_path),
+                }
+                self.opensearch_logger.log(
+                    monitor_type="filesystem_monitor",
+                    event_type="folder_deleted",
+                    event_details=event_details
+                )
             self.monitor.log_folder_deletion(event.src_path)
 
     def on_created(self, event):
@@ -871,10 +690,17 @@ class UserFileHandler(FileSystemEventHandler):
         # Only send individual event if not in bulk mode
         if not self.monitor.should_ignore(event.src_path):
             print(f"\n{'Folder' if event.is_directory else 'File'} creation detected: {event.src_path}")
-            self.monitor.send_to_opensearch(
-                "folder.created" if event.is_directory else "file.created", 
-                event.src_path
-            )
+            if self.opensearch_logger.client:
+                event_details = {
+                    "path": event.src_path,
+                    "name": os.path.basename(event.src_path),
+                    "is_directory": event.is_directory
+                }
+                self.opensearch_logger.log(
+                    monitor_type="filesystem_monitor",
+                    event_type="folder_created" if event.is_directory else "file_created",
+                    event_details=event_details
+                )
 
     def on_moved(self, event):
         if self.monitor.should_ignore(event.src_path):
@@ -882,13 +708,29 @@ class UserFileHandler(FileSystemEventHandler):
             
         # Always send move events
         print(f"\nFile/folder move detected: {event.src_path} -> {event.dest_path}")
-        details = {"source_path": event.src_path}
-        self.monitor.send_to_opensearch("file.moved", event.dest_path, details)
-        
-        if self.monitor.is_sensitive_file(event.dest_path):
-            self.monitor.send_to_opensearch("sensitive_file.moved", event.dest_path, details)
+        if self.opensearch_logger.client:
+            event_details = {
+                "source_path": event.src_path,
+                "destination_path": event.dest_path,
+                "file_name": os.path.basename(event.dest_path),
+                "is_directory": event.is_directory,
+                "is_sensitive": self.monitor.is_sensitive_file(event.dest_path) if not event.is_directory else False
+            }
+            event_type = "file_moved"
+            if event.is_directory:
+                event_type = "folder_moved"
+            elif self.monitor.is_sensitive_file(event.dest_path):
+                event_type = "sensitive_file_moved"
+                
+            self.opensearch_logger.log(
+                monitor_type="filesystem_monitor",
+                event_type=event_type,
+                event_details=event_details
+            )
             
-        self.monitor.log_bulk_operation("moved", event.dest_path)
+            # Log as bulk operation if necessary
+            if self.monitor.is_bulk_operation("moved", event.dest_path):
+                self.monitor.handle_bulk_operation("moved", event.dest_path)
 
 def main():
     print("\nIntelligent File Activity Monitor\n==========================")

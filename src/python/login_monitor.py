@@ -6,34 +6,20 @@ import win32api
 import os
 import sys
 import ctypes
-import logging
-
-def setup_logger(name, log_dir="logs"):
-    """Set up a logger instance"""
-    os.makedirs(log_dir, exist_ok=True)
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
-    
-    # Create handlers
-    file_handler = logging.FileHandler(os.path.join(log_dir, f"{name}.log"))
-    console_handler = logging.StreamHandler()
-    
-    # Create formatters and add it to handlers
-    log_format = '%(asctime)s - %(levelname)s - %(message)s'
-    formatter = logging.Formatter(log_format, datefmt='%Y-%m-%d %H:%M:%S')
-    file_handler.setFormatter(formatter)
-    console_handler.setFormatter(formatter)
-    
-    # Add handlers to the logger
-    logger.addHandler(file_handler)
-    logger.addHandler(console_handler)
-    
-    return logger
+from opensearch_logger import OpenSearchLogger
 
 class LoginMonitor:
-    def __init__(self, log_dir="logs"):
+    def __init__(self, electron_user_id=None):
         """Initialize login monitor"""
-        self.logger = setup_logger('login_monitor', log_dir)
+        # Instantiate the OpenSearch logger
+        self.opensearch_logger = OpenSearchLogger(electron_user_id=electron_user_id) 
+        # Keep essential info/error print for console feedback
+        print("Login Monitor initialized. Attempting to connect to OpenSearch...")
+        if not self.opensearch_logger.client:
+             print("WARNING: Failed to connect to OpenSearch. Logs will not be sent.")
+        else:
+             print("OpenSearch connection successful.")
+             
         self.server = 'localhost'
         self.logtype = 'Security'
         self.last_event = {}
@@ -131,13 +117,13 @@ class LoginMonitor:
             self.handle = win32evtlog.OpenEventLog(self.server, self.logtype)
             return True
         except Exception as e:
-            self.logger.error(f"Failed to open event log: {str(e)}")
+            print(f"ERROR: Failed to open event log: {str(e)}")
             return False
 
     def monitor(self):
         """Start monitoring login events"""
         if not self._is_admin():
-            self.logger.error("This script requires administrator privileges!")
+            print("ERROR: This script requires administrator privileges!")
             if sys.platform == 'win32':
                 ctypes.windll.shell32.ShellExecuteW(
                     None, "runas", sys.executable,
@@ -145,8 +131,8 @@ class LoginMonitor:
                 )
             sys.exit(1)
 
-        self.logger.info("Starting login monitoring...")
-        self.logger.info("Monitoring for login success/failure events...")
+        print("Starting login monitoring...")
+        print("Monitoring for login success/failure events...")
 
         flags = win32evtlog.EVENTLOG_FORWARDS_READ | win32evtlog.EVENTLOG_SEQUENTIAL_READ
         
@@ -186,40 +172,44 @@ class LoginMonitor:
                         self.last_event[event_key] = time.time()
                         
                         if event.EventID == 4624:  # Success
-                            msg_parts = [
-                                "LOGIN SUCCESS",
-                                f"User: {full_username}"
-                            ]
-                            
                             logon_type = self._get_logon_type(data.get('logon_type', ''))
-                            if logon_type:
-                                msg_parts.append(f"Type: {logon_type}")
-                                
-                            if data.get('workstation', '-') != '-':
-                                msg_parts.append(f"From: {data['workstation']}")
-                                
-                            if data.get('source_ip', '-') not in ['-', '::1', '127.0.0.1']:
-                                msg_parts.append(f"IP: {data['source_ip']}")
-                                
-                            self.logger.info(" | ".join(msg_parts))
-                            
+                            event_details = {
+                                "user": full_username,
+                                "status": "success",
+                                "logon_type_code": data.get('logon_type'),
+                                "logon_type_desc": logon_type,
+                                "workstation": data.get('workstation'),
+                                "source_ip": data.get('source_ip')
+                            }
+                            # Filter out null/empty details for cleaner logs
+                            event_details = {k: v for k, v in event_details.items() if v is not None and v != '' and v != '-'}
+                            self.opensearch_logger.log(
+                                monitor_type="login_monitor",
+                                event_type="user_login_success",
+                                event_details=event_details
+                            )
                         else:  # Failure
-                            msg_parts = [
-                                "LOGIN FAILED",
-                                f"User: {full_username}"
-                            ]
-                            
+                            reason = "Unknown"
                             if data.get('sub_status'):
                                 reason = self._get_status(data['sub_status'])
-                                msg_parts.append(f"Reason: {reason}")
                                 
-                            if data.get('workstation', '-') != '-':
-                                msg_parts.append(f"From: {data['workstation']}")
-                                
-                            if data.get('source_ip', '-') not in ['-', '::1', '127.0.0.1']:
-                                msg_parts.append(f"IP: {data['source_ip']}")
-                                
-                            self.logger.warning(" | ".join(msg_parts))
+                            event_details = {
+                                "user": full_username,
+                                "status": "failed",
+                                "reason_code": data.get('sub_status'),
+                                "reason_desc": reason,
+                                "logon_type_code": data.get('logon_type'),
+                                "logon_type_desc": self._get_logon_type(data.get('logon_type')),
+                                "workstation": data.get('workstation'),
+                                "source_ip": data.get('source_ip')
+                            }
+                             # Filter out null/empty details
+                            event_details = {k: v for k, v in event_details.items() if v is not None and v != '' and v != '-'}
+                            self.opensearch_logger.log(
+                                monitor_type="login_monitor",
+                                event_type="user_login_failed",
+                                event_details=event_details
+                            )
 
                     # Clean up old events
                     current_time = time.time()
@@ -229,7 +219,7 @@ class LoginMonitor:
                     }
 
                 except Exception as e:
-                    self.logger.error(f"Error reading events: {str(e)}")
+                    print(f"ERROR: Error reading events: {str(e)}")
                     self.handle = None  # Force handle refresh
                     time.sleep(5)
                     continue
@@ -237,9 +227,9 @@ class LoginMonitor:
                 time.sleep(1)  # Small delay to prevent high CPU usage
 
         except KeyboardInterrupt:
-            self.logger.info("Login monitoring stopped")
+            print("Login monitoring stopped")
         except Exception as e:
-            self.logger.error(f"Error in login monitoring: {str(e)}")
+            print(f"ERROR: Error in login monitoring: {str(e)}")
         finally:
             if self.handle:
                 try:

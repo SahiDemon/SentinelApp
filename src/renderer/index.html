@@ -46,7 +46,9 @@
 
     <div class="dashboard" id="dashboard">
         <div class="dashboard-header">
-            <div class="status-badge" style="font-family: 'Orbitron', sans-serif;">Sentinel is Live</div>
+            <div id="sentinel-status" class="status-badge" style="font-family: 'Orbitron', sans-serif;">
+                <i class="fas fa-circle-notch fa-spin"></i> Checking Sentinel Status...
+            </div>
             <div class="logo">
                 <img src="../assets/sentinalprime.png" alt="Sentinel Prime">
             </div>
@@ -59,58 +61,122 @@
             </button>
         </div>
         
-        <div class="security-card">
-            <div class="security-status">
-                <div class="tier" id="securityTier" style="font-family: 'Orbitron', sans-serif;">RELIABLE</div>
-                <div class="status-description" id="statusDescription">
-                    Your system activity indicates normal behavior patterns.
-                    Continue maintaining good security practices.
+        <nav class="tabs">
+            <button class="tab-button active" data-tab="home">
+                <i class="fas fa-home"></i> Home
+            </button>
+            <button class="tab-button" data-tab="diagnostics">
+                <i class="fas fa-tachometer-alt"></i> Diagnostics
+            </button>
+            <button class="tab-button" data-tab="monitor-status">
+                <i class="fas fa-server"></i> Monitors
+            </button>
+            <button class="tab-button" data-tab="settings">
+                <i class="fas fa-cog"></i> Settings
+            </button>
+        </nav>
+
+        <div class="tab-content active" id="home-tab-content">
+            <div class="home-dashboard-grid">
+                <div class="security-card">
+                    <div class="security-status">
+                        <div class="tier" id="securityTier" style="font-family: 'Orbitron', sans-serif;">RELIABLE</div>
+                        <div class="status-description" id="statusDescription">
+                            Your system activity indicates normal behavior patterns.
+                            Continue maintaining good security practices.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="home-welcome-card">
+                <div class="home-welcome-header">
+                    <div class="welcome-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>System Overview</h3>
+                </div>
+                
+                <div class="quick-stats">
+                    <div class="quick-stat-item">
+                        <div class="quick-stat-label">Monitors Active</div>
+                        <div class="quick-stat-value" style="font-family: Arial, sans-serif;"><i class="fas fa-check-circle"></i>7/7</div>
+                    </div>
+                    <div class="quick-stat-item">
+                        <div class="quick-stat-label">Last Scan</div>
+                        <div class="quick-stat-value " style="font-family: Arial, sans-serif;";><i class="fas fa-clock"></i>2 min ago</div>
+                    </div>
+                    <div class="quick-stat-item">
+                        <div class="quick-stat-label">Threats Detected</div>
+                        <div class="quick-stat-value" style="font-family: Arial, sans-serif;"><i class="fas fa-shield-alt"></i>0</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="system-status-card">
-            <h3 style="font-family: 'Orbitron', sans-serif;">System Diagnostics</h3>
-            <div class="system-info">
-                <div class="info-item ">
-                    <label class="tranformer-font">CPU Utilization</label>
-                    <div><span id="cpu-usage">0.0</span>%</div>
-                </div>
-                <div class="info-item">
-                    <label class="tranformer-font">Memory Usage</label>
-                    <div><span id="ram-usage">0.0</span>%</div>
-                </div>
-                <div class="info-item">
-                    <label class="tranformer-font">Storage Status</label>
-                    <div><span id="storage-info">Analyzing...</span></div>
+        <div class="tab-content" id="diagnostics-tab-content">
+            <div class="system-status-card">
+                <h3 style="font-family: 'Orbitron', sans-serif;">System Diagnostics</h3>
+                <div class="system-info">
+                    <div class="info-item ">
+                        <label class="tranformer-font">CPU Utilization</label>
+                        <div><span id="cpu-usage">0.0</span>%</div>
+                    </div>
+                    <div class="info-item">
+                        <label class="tranformer-font">Memory Usage</label>
+                        <div><span id="ram-usage">0.0</span>%</div>
+                    </div>
+                    <div class="info-item">
+                        <label class="tranformer-font">Storage Status</label>
+                        <div><span id="storage-info">Analyzing...</span></div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="theme-switcher">
-        <button id="theme-switcher-toggle" class="theme-button">
-            <i class="fas fa-paint-brush"></i>
-            <span>Switch Theme</span>
-        </button>
-        <div id="theme-buttons" class="theme-buttons">
-            <button class="theme-button active" data-theme="cyberpunk">
-                <i class="fas fa-robot"></i>
-                <span>Cyberpunk</span>
-            </button>
-            <button class="theme-button" data-theme="midnight">
-                <i class="fas fa-moon"></i>
-                <span>Midnight</span>
-            </button>
-            <button class="theme-button" data-theme="professional">
-                <i class="fas fa-briefcase"></i>
-                <span>Professional</span>
-            </button>
-            <button class="theme-button" data-theme="dark">
-                <i class="fas fa-circle-half-stroke"></i>
-                <span>Dark</span>
-            </button>
+        <div class="tab-content" id="monitor-status-tab-content">
+            <div class="monitor-status-card">
+                <div class="monitor-status-header">
+                    <h3>Monitor Status</h3>
+                    <button id="refresh-status" class="status-button">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+                <div id="monitor-status-container" class="monitor-status-container">
+                    <div class="loading-indicator">
+                        <i class="fas fa-circle-notch fa-spin"></i> Loading monitor status...
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <div class="tab-content" id="settings-tab-content">
+            <div class="settings-card">
+                <h3 style="font-family: 'Orbitron', sans-serif;">Appearance Settings</h3>
+                <div class="theme-switcher" id="theme-switcher-container"> 
+                    <p>Select a theme:</p>
+                    <div id="theme-buttons" class="theme-buttons active">
+                        <button class="theme-button" data-theme="cyberpunk">
+                            <i class="fas fa-robot"></i>
+                            <span>Cyberpunk</span>
+                        </button>
+                        <button class="theme-button" data-theme="midnight">
+                            <i class="fas fa-moon"></i>
+                            <span>Midnight</span>
+                        </button>
+                        <button class="theme-button" data-theme="professional">
+                            <i class="fas fa-briefcase"></i>
+                            <span>Professional</span>
+                        </button>
+                        <button class="theme-button" data-theme="dark">
+                            <i class="fas fa-circle-half-stroke"></i>
+                            <span>Dark</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
     </div>
 
     <script type="module" src="./js/index.js"></script>

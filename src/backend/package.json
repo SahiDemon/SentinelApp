@@ -1,0 +1,16 @@
+{
+  "name": "sentinel-backend-service",
+  "version": "1.0.0",
+  "description": "Backend service for Sentinel Security Monitor",
+  "main": "sentinel-service.js",
+  "scripts": {
+    "start": "node start-service.js",
+    "service": "node sentinel-service.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "is-elevated": "^4.0.0",
+    "sudo-prompt": "^9.2.1"
+  }
+} 

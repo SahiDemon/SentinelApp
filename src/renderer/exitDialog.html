@@ -234,33 +234,55 @@
             <label for="confirmCheck">I understand this action will be reported!</label>
         </div>
         <div class="buttons">
-            <button class="cancel-btn" onclick="cancelExit()">Cancel</button>
-            <button class="exit-btn" onclick="confirmExit()">Exit</button>
+            <button class="cancel-btn" id="cancelBtn">Cancel</button>
+            <button class="exit-btn" id="exitBtn">Exit</button>
         </div>
     </div>
 
     <script>
-        const { ipcRenderer } = require('electron');
-
-        function cancelExit() {
-            ipcRenderer.send('exit-dialog-response', false);
-        }
-
-        function confirmExit() {
+        // Wait for the DOM and preload script to be ready
+        document.addEventListener('DOMContentLoaded', () => {
             const checkbox = document.getElementById('confirmCheck');
-            if (checkbox.checked) {
-                ipcRenderer.send('exit-dialog-response', true);
-            } else {
-                checkbox.parentElement.classList.add('checkbox-error');
-                setTimeout(() => {
-                    checkbox.parentElement.classList.remove('checkbox-error');
-                }, 400);
+            const checkboxContainer = document.querySelector('.checkbox-container');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const exitBtn = document.getElementById('exitBtn');
+            
+            // Ensure elements exist before adding listeners
+            if (!checkbox || !checkboxContainer || !cancelBtn || !exitBtn) {
+                console.error("Exit dialog elements not found!");
+                return; 
             }
-        }
 
-        // Prevent dragging
-        document.addEventListener('dragstart', (e) => e.preventDefault());
-        document.addEventListener('drop', (e) => e.preventDefault());
+            function cancelExit() {
+                // Use the exposed API from preload script
+                if (window.api) {
+                    window.api.send('exit-dialog-response', false);
+                } else {
+                    console.error("window.api not found - preload script issue?");
+                }
+            }
+
+            function confirmExit() {
+                if (!checkbox.checked) {
+                    checkboxContainer.classList.add('checkbox-error');
+                    // Remove the error class after the animation completes
+                    setTimeout(() => {
+                        checkboxContainer.classList.remove('checkbox-error');
+                    }, 400);
+                    return;
+                }
+                // Use the exposed API from preload script
+                if (window.api) {
+                    window.api.send('exit-dialog-response', true);
+                } else {
+                    console.error("window.api not found - preload script issue?");
+                }
+            }
+            
+            // Add event listeners
+            cancelBtn.addEventListener('click', cancelExit);
+            exitBtn.addEventListener('click', confirmExit);
+        });
     </script>
 </body>
 </html>

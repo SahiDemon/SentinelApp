@@ -69,7 +69,6 @@
 .theme-professional .security-card {
     padding: 16px;
     margin: 12px;
-    
 }
 
 .theme-professional .system-status-card {
@@ -133,6 +132,7 @@
     background: var(--surface);
     border-bottom: 1px solid var(--border-color);
     padding: 12px;
+    margin: 10px
 }
 
 .theme-professional .status-badge {
@@ -186,7 +186,6 @@
     padding: 16px;
     margin: 12px;
     box-shadow: var(--shadow);
-    margin-top: -12px;
 }
 
 .theme-professional .security-status {

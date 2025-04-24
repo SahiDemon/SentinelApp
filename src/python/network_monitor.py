@@ -12,25 +12,7 @@ from ctypes import windll
 import dns.resolver
 import threading
 import queue
-
-def setup_logger(name, log_dir="logs"):
-    """Set up a logger instance"""
-    os.makedirs(log_dir, exist_ok=True)
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
-    
-    file_handler = logging.FileHandler(os.path.join(log_dir, f"{name}.log"))
-    console_handler = logging.StreamHandler()
-    
-    log_format = '%(asctime)s - %(levelname)s - %(message)s'
-    formatter = logging.Formatter(log_format, datefmt='%Y-%m-%d %H:%M:%S')
-    file_handler.setFormatter(formatter)
-    console_handler.setFormatter(formatter)
-    
-    logger.addHandler(file_handler)
-    logger.addHandler(console_handler)
-    
-    return logger
+from opensearch_logger import OpenSearchLogger
 
 def is_admin():
     """Check if script is running with admin rights"""
@@ -40,13 +22,18 @@ def is_admin():
         return False
 
 class NetworkMonitor:
-    def __init__(self, log_dir="logs"):
+    def __init__(self, electron_user_id=None):
         """Initialize network monitor"""
         # Ensure we have admin rights before initialization
         if not is_admin():
             raise PermissionError("Administrator privileges required")
         
-        self.logger = setup_logger('network_monitor', log_dir)
+        self.opensearch_logger = OpenSearchLogger(electron_user_id=electron_user_id)
+        print("Network Monitor initialized. Attempting to connect to OpenSearch...")
+        if not self.opensearch_logger.client:
+            print("WARNING: Failed to connect to OpenSearch. Logs will not be sent.")
+        else:
+            print("OpenSearch connection successful.")
         self.known_connections = {}
         self.app_connections = defaultdict(set)
         self.domain_cache = defaultdict(set)  # Cache domains per process
@@ -86,45 +73,11 @@ class NetworkMonitor:
         except:
             return {'name': 'Unknown', 'exe': '', 'cmdline': ''}
 
-    def _is_system_process(self, proc_name):
-        """Check if process is a system process"""
-        return proc_name.lower() in {p.lower() for p in self.system_processes}
-
-    def _is_web_browser(self, proc_name):
-        """Check if process is a web browser"""
-        return proc_name.lower() in {b.lower() for b in self.browsers}
-
-    def _format_message(self, proc_name, remote_addr, domain, status):
-        """Format connection message with domain information"""
-        msg_parts = [
-            f"Network Activity",
-            f"Process: {proc_name}"
-        ]
-        
-        if domain and domain != remote_addr:
-            msg_parts.append(f"Domain: {domain}")
-            msg_parts.append(f"IP: {remote_addr}")
-        else:
-            msg_parts.append(f"Address: {remote_addr}")
-            
-        msg_parts.append(f"Status: {status}")
-        
-        # Add cached domains for this process
-        if proc_name in self.domain_cache:
-            recent_domains = list(self.domain_cache[proc_name])[-3:]  # Last 3 domains
-            if recent_domains:
-                domains_str = ", ".join(recent_domains)
-                if len(self.domain_cache[proc_name]) > 3:
-                    domains_str += f" (+{len(self.domain_cache[proc_name])-3} more)"
-                msg_parts.append(f"Recent Domains: {domains_str}")
-        
-        return " | ".join(msg_parts)
-
     def monitor(self):
         """Start monitoring network connections"""
         try:
-            self.logger.info("Starting network monitoring...")
-            self.logger.info("Monitoring non-browser network connections...")
+            print("Starting network monitoring...")
+            print("Monitoring non-browser network connections...")
 
             while True:
                 try:
@@ -139,10 +92,12 @@ class NetworkMonitor:
                         proc_name = proc_info['name']
                         
                         # Skip system processes and browsers
-                        if self._is_system_process(proc_name) or self._is_web_browser(proc_name):
+                        if proc_name.lower() in {p.lower() for p in self.system_processes} or \
+                           proc_name.lower() in {b.lower() for b in self.browsers}:
                             continue
                             
                         remote_addr = f"{conn.raddr.ip}:{conn.raddr.port}"
+                        local_addr = f"{conn.laddr.ip}:{conn.laddr.port}" if conn.laddr else None
                         conn_key = f"{conn.pid}:{conn.laddr.port}"
                         
                         # Resolve domain
@@ -160,17 +115,45 @@ class NetworkMonitor:
                         # Log new connections
                         if conn_key not in self.known_connections:
                             self.known_connections[conn_key] = current_connections[conn_key]
-                            msg = self._format_message(
-                                proc_name, remote_addr, domain, conn.status
+                            event_details = {
+                                "process_pid": conn.pid,
+                                "process_name": proc_name,
+                                "process_exe": proc_info.get('exe'),
+                                "local_address": local_addr,
+                                "remote_address": remote_addr,
+                                "remote_domain": domain if domain != conn.raddr.ip else None,
+                                "connection_status": conn.status,
+                                "protocol": conn.type # SOCK_STREAM (TCP) or SOCK_DGRAM (UDP)
+                            }
+                            event_details = {k: v for k, v in event_details.items() if v is not None and v != ''}
+                            self.opensearch_logger.log(
+                                monitor_type="network_monitor",
+                                event_type="network_connection_established",
+                                event_details=event_details
                             )
-                            self.logger.info(msg)
                     
                     # Check for closed connections
                     for conn_key in list(self.known_connections.keys()):
                         if conn_key not in current_connections:
                             conn_info = self.known_connections[conn_key]
-                            msg = f"Connection Closed | Process: {conn_info['process']} | Address: {conn_info['remote_addr']}"
-                            self.logger.info(msg)
+                            # Re-fetch proc info in case it changed?
+                            # No, use cached info for the closed connection
+                            proc_details = self._get_process_info(int(conn_key.split(':')[0])) # Get pid from key
+                            event_details = {
+                                "process_pid": int(conn_key.split(':')[0]),
+                                "process_name": conn_info.get('process'),
+                                "process_exe": proc_details.get('exe'),
+                                "local_address": conn_key.split(':', 1)[1], # Approximated from key
+                                "remote_address": conn_info.get('remote_addr'),
+                                "remote_domain": conn_info.get('domain') if conn_info.get('domain') != conn_info.get('remote_addr', '').split(':')[0] else None,
+                                "connection_status": "CLOSED" # Explicitly set status
+                            }
+                            event_details = {k: v for k, v in event_details.items() if v is not None and v != ''}
+                            self.opensearch_logger.log(
+                                monitor_type="network_monitor",
+                                event_type="network_connection_closed",
+                                event_details=event_details
+                            )
                             del self.known_connections[conn_key]
                     
                     # Clean up old domain cache (keep last 100 domains per process)
@@ -181,14 +164,14 @@ class NetworkMonitor:
                     time.sleep(1)
                     
                 except Exception as e:
-                    self.logger.error(f"Error monitoring network: {str(e)}")
+                    print(f"ERROR: Error monitoring network: {str(e)}")
                     time.sleep(5)
                     continue
 
         except KeyboardInterrupt:
-            self.logger.info("Network monitoring stopped")
+            print("Network monitoring stopped")
         except Exception as e:
-            self.logger.error(f"Error in network monitoring: {str(e)}")
+            print(f"ERROR: Error in network monitoring: {str(e)}")
 
 def main():
     """Main function"""

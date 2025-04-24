@@ -1,33 +1,19 @@
 import psutil
 import time
 import os
-import logging
 from datetime import datetime
 import re
-
-def setup_logger(name, log_dir="logs"):
-    """Set up a logger instance"""
-    os.makedirs(log_dir, exist_ok=True)
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
-    
-    file_handler = logging.FileHandler(os.path.join(log_dir, f"{name}.log"))
-    console_handler = logging.StreamHandler()
-    
-    log_format = '%(asctime)s - %(levelname)s - %(message)s'
-    formatter = logging.Formatter(log_format, datefmt='%Y-%m-%d %H:%M:%S')
-    file_handler.setFormatter(formatter)
-    console_handler.setFormatter(formatter)
-    
-    logger.addHandler(file_handler)
-    logger.addHandler(console_handler)
-    
-    return logger
+from opensearch_logger import OpenSearchLogger
 
 class ProcessMonitor:
-    def __init__(self, log_dir="logs"):
+    def __init__(self, electron_user_id=None):
         """Initialize process monitor"""
-        self.logger = setup_logger('process_monitor', log_dir)
+        self.opensearch_logger = OpenSearchLogger(electron_user_id=electron_user_id)
+        print("Process Monitor initialized. Attempting to connect to OpenSearch...")
+        if not self.opensearch_logger.client:
+            print("WARNING: Failed to connect to OpenSearch. Logs will not be sent.")
+        else:
+            print("OpenSearch connection successful.")
         self.known_processes = {}
         
         # System processes to ignore
@@ -82,43 +68,10 @@ class ProcessMonitor:
         except:
             return None
 
-    def _format_process_message(self, pid, info, event_type="Started"):
-        """Format process information into a readable message"""
-        if not info:
-            return None
-            
-        msg_parts = [
-            f"Process {event_type}",
-            f"{info['name']} (PID: {pid})"
-        ]
-        
-        if info.get('cmdline'):
-            # Truncate command line if too long
-            cmdline = info['cmdline']
-            if len(cmdline) > 100:
-                cmdline = cmdline[:97] + "..."
-            msg_parts.append(f"CMD: {cmdline}")
-            
-        if info.get('cpu_percent') or info.get('memory_percent'):
-            resources = []
-            if info.get('cpu_percent'):
-                resources.append(f"CPU: {info['cpu_percent']}%")
-            if info.get('memory_percent'):
-                resources.append(f"Memory: {info['memory_percent']}%")
-            msg_parts.append(" ".join(resources))
-            
-        if info.get('parent', 'Unknown') != 'Unknown':
-            msg_parts.append(f"Parent: {info['parent']}")
-            
-        if info.get('username'):
-            msg_parts.append(f"User: {info['username']}")
-            
-        return " | ".join(msg_parts)
-
     def monitor(self):
         """Start monitoring processes"""
-        self.logger.info("Starting process monitoring...")
-        self.logger.info("Monitoring all non-system processes...")
+        print("Starting process monitoring...")
+        print("Monitoring all non-system processes...")
 
         try:
             while True:
@@ -135,30 +88,53 @@ class ProcessMonitor:
                             info = self._get_process_info(proc)
                             if info:
                                 self.known_processes[pid] = info
-                                msg = self._format_process_message(pid, info)
-                                if msg:
-                                    self.logger.info(msg)
+                                event_details = {
+                                    "process_pid": pid,
+                                    "process_name": info.get('name'),
+                                    "command_line": info.get('cmdline'),
+                                    "user": info.get('username'),
+                                    "parent_process": info.get('parent'),
+                                    "status": info.get('status'),
+                                    "create_time": info.get('create_time')
+                                }
+                                event_details = {k: v for k, v in event_details.items() if v is not None and v != ''}
+                                self.opensearch_logger.log(
+                                    monitor_type="process_monitor",
+                                    event_type="process_started",
+                                    event_details=event_details
+                                )
                     
                     # Check for terminated processes
                     for pid in list(self.known_processes.keys()):
                         if pid not in current_processes:
                             info = self.known_processes[pid]
-                            msg = self._format_process_message(pid, info, "Terminated")
-                            if msg:
-                                self.logger.info(msg)
+                            event_details = {
+                                "process_pid": pid,
+                                "process_name": info.get('name'),
+                                "command_line": info.get('cmdline'),
+                                "user": info.get('username'),
+                                "parent_process": info.get('parent'),
+                                "create_time": info.get('create_time')
+                            }
+                            event_details = {k: v for k, v in event_details.items() if v is not None and v != ''}
+                            self.opensearch_logger.log(
+                                monitor_type="process_monitor",
+                                event_type="process_terminated",
+                                event_details=event_details
+                            )
                             del self.known_processes[pid]
                     
                     time.sleep(1)  # Small delay to prevent high CPU usage
                     
                 except Exception as e:
-                    self.logger.error(f"Error monitoring processes: {str(e)}")
+                    print(f"ERROR: Error monitoring processes: {str(e)}")
                     time.sleep(5)
                     continue
 
         except KeyboardInterrupt:
-            self.logger.info("Process monitoring stopped")
+            print("Process monitoring stopped")
         except Exception as e:
-            self.logger.error(f"Error in process monitoring: {str(e)}")
+            print(f"ERROR: Error in process monitoring: {str(e)}")
 
 def main():
     """Main function"""
