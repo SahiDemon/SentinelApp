@@ -8,14 +8,21 @@ import signal
 import psutil
 import re
 import ctypes
-from opensearch_logger import OpenSearchLogger
-from login_monitor import LoginMonitor
-from process_monitor import ProcessMonitor
-from network_monitor import NetworkMonitor
-from filesystem_monitor import UserFileMonitor as FileSystemMonitor
-from system_monitor import SystemMonitor
-from browser_monitor import BrowserMonitor
-from usb_monitor import USBMonitor
+import json
+
+# Add parent directory to path to fix imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+# When running as module (-m), imports need to be absolute from inside the module
+from src.python.opensearch_logger import OpenSearchLogger
+from src.python.login_monitor import LoginMonitor
+from src.python.process_monitor import ProcessMonitor
+from src.python.network_monitor import NetworkMonitor
+from src.python.filesystem_monitor import UserFileMonitor as FileSystemMonitor
+from src.python.system_monitor import SystemMonitor
+from src.python.browser_monitor import BrowserMonitor
+from src.python.usb_monitor import USBMonitor
+from src.python.user_identity import user_identity
 
 # Global instance for signal handling
 _sentinel_instance = None
@@ -65,6 +72,9 @@ class SentinelMonitor:
         self.logger.addHandler(handler)
         self.logger.addHandler(console_handler)
         
+        # Initialize user identity
+        self._initialize_user_identity(user_id)
+        
         self.logger.info(f"Sentinel starting. User ID: {self.user_id}, Admin privileges: {self.is_admin}")
         print(f"Sentinel starting for user {self.user_id}. Admin: {self.is_admin}", flush=True) # Info to stdout
             
@@ -79,6 +89,12 @@ class SentinelMonitor:
             'USB': {'class': USBMonitor, 'requires_admin': True, 'instance': None, 'status': False}
         }
         
+        # Create OpenSearch logger with user identity
+        self.opensearch_logger = OpenSearchLogger(electron_user_id=self.user_id)
+        
+        # Log session start
+        self._log_session_start()
+        
         # Instantiate non-admin monitors immediately
         for name, config in self.monitors_config.items():
             if not config['requires_admin']:
@@ -91,6 +107,74 @@ class SentinelMonitor:
         
         self.threads = {}
         self.stopping = False
+    
+    def _initialize_user_identity(self, user_id: str):
+        """Initialize the user identity for consistent identification"""
+        # Get device information for correlation
+        device_info = self._get_device_info()
+        
+        # Set the user in the user identity module
+        user_identity.set_user(user_id)
+        
+        # Start a new session
+        session_id = user_identity.start_session()
+        
+        # Log this information
+        self.logger.info(f"User identity initialized: User ID: {user_id}, Session: {session_id}")
+        
+        # We'll register this auth event in OpenSearch after logger is initialized
+    
+    def _get_device_info(self):
+        """Get device information for identity correlation"""
+        try:
+            device_info = {
+                "os": sys.platform,
+                "hostname": os.environ.get("COMPUTERNAME", "unknown") if sys.platform == "win32" else os.uname().nodename,
+                "username": os.environ.get("USERNAME", "unknown") if sys.platform == "win32" else os.environ.get("USER", "unknown"),
+                "cpu_cores": psutil.cpu_count(),
+                "memory_gb": round(psutil.virtual_memory().total / (1024**3), 2),
+                "sentinel_start_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.start_time))
+            }
+            return device_info
+        except Exception as e:
+            self.logger.error(f"Error getting device info: {e}")
+            return {"error": str(e)}
+    
+    def _log_session_start(self):
+        """Log session start event to OpenSearch"""
+        try:
+            # Get device info for the session
+            device_info = self._get_device_info()
+            
+            # Log session start event
+            self.opensearch_logger.log(
+                monitor_type="sentinel",
+                event_type="session_start",
+                event_details={
+                    "user_id": self.user_id,
+                    "session_id": user_identity.session_id,
+                    "correlation_id": user_identity.correlation_id,
+                    "device_info": device_info,
+                    "admin_privileges": self.is_admin
+                }
+            )
+            
+            # Register this authentication event
+            self.logger.info("Registering new session in user registry")
+            
+            # We need to communicate with main process to call the JS API
+            print(json.dumps({
+                "type": "session_start",
+                "data": {
+                    "user_id": self.user_id,
+                    "session_id": user_identity.session_id,
+                    "correlation_id": user_identity.correlation_id,
+                    "device_info": device_info
+                }
+            }), flush=True)
+            
+        except Exception as e:
+            self.logger.error(f"Error logging session start: {e}")
 
     def _run_monitor(self, name):
         """Instantiate (if needed) and run a monitor in a loop"""
@@ -155,7 +239,7 @@ class SentinelMonitor:
             self.logger.info(log_msg_end)
             print(log_msg_end, flush=True)
             # Ensure status reflects that the loop is no longer active
-            self.monitors_config[name]['status'] = False 
+            self.monitors_config[name]['status'] = False
 
     def _check_monitor_status(self):
         """Log the status of all monitors based on thread and config status"""

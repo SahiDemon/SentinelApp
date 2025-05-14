@@ -570,6 +570,15 @@ async function startSentinelMonitor(userId: string | null) {
         
         // Build command arguments
         const args = [pythonScriptPath, '--user-id', userId];
+
+        // Try running as a module instead if in development mode
+        if (isDev) {
+            // Change to running as a module
+            const pythonModule = 'src.python.sentinel';
+            args.splice(0, 1, '-m', pythonModule);
+            console.log(`Running Python as module: ${pythonExecutable} -m ${pythonModule}`);
+        }
+
         // Pass admin status correctly based on app's actual privilege level
         if (isRunningAsAdmin) {
              args.push('--admin');
@@ -584,7 +593,9 @@ async function startSentinelMonitor(userId: string | null) {
             detached: false, // Don't detach unless necessary
             env: {
                 ...process.env,
-                SENTINEL_INTEGRATED: process.env.SENTINEL_INTEGRATED || 'false'
+                SENTINEL_INTEGRATED: process.env.SENTINEL_INTEGRATED || 'false',
+                // Add PYTHONPATH to help Python find modules
+                PYTHONPATH: path.join(appPath) + (process.env.PYTHONPATH ? path.delimiter + process.env.PYTHONPATH : '')
             }
         };
         
