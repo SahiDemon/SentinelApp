@@ -5,6 +5,7 @@ import os from 'os';
 import { spawn, ChildProcess, exec } from 'child_process';
 import fs from 'fs';
 import http from 'http';
+import deviceRegistry from './device-registry';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -234,6 +235,8 @@ app.setAsDefaultProtocolClient('sentinel');
 let tray: Tray | null = null;
 let isQuitting = false;
 let exitDialogWindow: BrowserWindow | null = null;
+let exitReported = false;
+let isRestarting = false;
 
 function createTray() {
     const iconPath = path.join(__dirname, '../assets/sentinalprime.png');
@@ -294,9 +297,24 @@ function showExitConfirmation() {
     });
 }
 
-ipcMain.on('exit-dialog-response', (_, shouldExit: boolean) => {
+ipcMain.on('exit-dialog-response', async (_, { shouldExit, isAdmin }) => {
     if (shouldExit) {
         isQuitting = true;
+        
+        // Only report if not already reported
+        if (!exitReported) {
+            try {
+                await deviceRegistry.reportAppExit(
+                    currentUserId, 
+                    isAdmin || false,
+                    isAdmin ? 'Administrator authorized exit' : 'User initiated exit'
+                );
+                exitReported = true;
+            } catch (error) {
+                console.error('Error reporting app exit:', error);
+            }
+        }
+        
         if (mainWindow) {
             mainWindow.destroy();
         }
@@ -306,6 +324,9 @@ ipcMain.on('exit-dialog-response', (_, shouldExit: boolean) => {
 });
 
 let mainWindow: BrowserWindow | null = null;
+
+// Global variable for tracking user ID
+let currentUserId: string | null = null;
 
 app.whenReady().then(async () => {
     // Always check for admin privileges
@@ -417,9 +438,34 @@ app.whenReady().then(async () => {
         }
     });
 
-    app.on('before-quit', () => {
-        isQuitting = true;
+    app.on('before-quit', async (event) => {
+        // If we haven't reported the exit yet and it's a normal quit (not a restart)
+        if (!exitReported && !isRestarting) {
+            event.preventDefault();
+            isQuitting = true;
+            
+            try {
+                // Report app exit (assume non-admin exit if happening outside the dialog)
+                await deviceRegistry.reportAppExit(
+                    currentUserId, 
+                    false,
+                    'Application quit'
+                );
+                exitReported = true;
+                app.quit();
+            } catch (error) {
+                console.error('Error reporting app exit:', error);
+                exitReported = true;
+                app.quit();
+            }
+        }
+        
+        // Stop device registry services
+        deviceRegistry.stopServices();
     });
+
+    // Initialize device registry (will auto-register when user logs in)
+    // deviceRegistry.loadConfig(); // This line is removed as it's called in the constructor
 });
 
 // Ensure sentinel is stopped when app quits
@@ -801,6 +847,14 @@ async function startSentinelMonitor(userId: string | null) {
                 admin: isRunningAsAdmin,
                 requiresAdmin: process.platform === 'win32' && !isDev && appConfig.requireAdminPrivileges
             });
+        }
+        
+        // Store user ID for device registration
+        currentUserId = userId;
+        
+        // Register device with SentinelPrime
+        if (userId) {
+            deviceRegistry.startServices(userId);
         }
         
         return { 

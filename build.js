@@ -68,7 +68,10 @@ async function build() {
             format: 'esm',
             target: 'node16',
             outfile: path.join(__dirname, 'dist/main/main.js'),
-            external: ['electron']
+            external: ['electron'],
+            banner: {
+                js: "import { createRequire } from 'module'; const require = createRequire(import.meta.url);"
+            }
         });
 
         // Bundle the preload script

@@ -247,6 +247,31 @@
             const cancelBtn = document.getElementById('cancelBtn');
             const exitBtn = document.getElementById('exitBtn');
             
+            // Flag to track if user is admin (default to false)
+            let isAdmin = false;
+            
+            // Check if user is an admin if API is available
+            if (window.api && window.api.getUser) {
+                window.api.getUser().then(user => {
+                    // Check if user has admin role
+                    isAdmin = user && user.user_metadata && 
+                             (user.user_metadata.role === 'admin' || 
+                              user.email === 'admin@sentinel.local');
+                    
+                    // Update message based on admin status
+                    const messageEl = document.querySelector('.message');
+                    if (messageEl) {
+                        if (isAdmin) {
+                            messageEl.innerHTML = 'You are authorized to exit the application.<br>Proceed with shutdown?';
+                        } else {
+                            messageEl.innerHTML = 'Only administrators are allowed to exit the application.<br>Are you sure you want to proceed?';
+                        }
+                    }
+                }).catch(err => {
+                    console.error("Error checking admin status:", err);
+                });
+            }
+            
             // Ensure elements exist before adding listeners
             if (!checkbox || !checkboxContainer || !cancelBtn || !exitBtn) {
                 console.error("Exit dialog elements not found!");
@@ -256,7 +281,7 @@
             function cancelExit() {
                 // Use the exposed API from preload script
                 if (window.api) {
-                    window.api.send('exit-dialog-response', false);
+                    window.api.send('exit-dialog-response', {shouldExit: false, isAdmin: false});
                 } else {
                     console.error("window.api not found - preload script issue?");
                 }
@@ -273,7 +298,7 @@
                 }
                 // Use the exposed API from preload script
                 if (window.api) {
-                    window.api.send('exit-dialog-response', true);
+                    window.api.send('exit-dialog-response', {shouldExit: true, isAdmin: isAdmin});
                 } else {
                     console.error("window.api not found - preload script issue?");
                 }
