@@ -6,6 +6,7 @@ import { spawn, ChildProcess, exec } from 'child_process';
 import fs from 'fs';
 import http from 'http';
 import deviceRegistry from './device-registry';
+import { getMonitorConfigurations } from './supabase-client';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -442,7 +443,7 @@ app.whenReady().then(async () => {
         // If we haven't reported the exit yet and it's a normal quit (not a restart)
         if (!exitReported && !isRestarting) {
             event.preventDefault();
-            isQuitting = true;
+        isQuitting = true;
             
             try {
                 // Report app exit (assume non-admin exit if happening outside the dialog)
@@ -481,6 +482,9 @@ app.on('quit', async () => {
 
 let sentinelProcess: ChildProcess | null = null;
 let sentinelUserId: string | null = null; // Store the current user ID for Sentinel
+let sentinelLogFile: string | null = null;
+let capturedStdout: string = ''; // Store stdout for log analysis
+let lastMonitorStatusJson: any = {}; // Store the last captured monitor status
 
 // Helper function to check if a process is running
 async function isProcessRunning(pid: number | undefined): Promise<boolean> {
@@ -704,6 +708,20 @@ async function startSentinelMonitor(userId: string | null) {
                     });
                 }
                 
+                // Check for monitor status JSON
+                const jsonLinePrefix = "MONITOR_STATUS_JSON: ";
+                if (output.includes(jsonLinePrefix)) {
+                    try {
+                        const jsonStart = output.indexOf(jsonLinePrefix) + jsonLinePrefix.length;
+                        const jsonStr = output.substring(jsonStart);
+                        const statusJson = JSON.parse(jsonStr);
+                        console.log("Captured monitor status JSON:", statusJson);
+                        lastMonitorStatusJson = statusJson;
+                    } catch (e) {
+                        console.error("Error parsing monitor status JSON from stdout:", e);
+                    }
+                }
+
                 console.log(`[PID ${currentPid}] Sentinel stdout: ${output}`);
                 if (output.includes("SENTINEL_READY")) {
                     isReady = true;
@@ -1111,5 +1129,92 @@ ipcMain.handle('get-python-logs', async () => {
     } catch (error: any) {
         console.error('Error getting Python logs:', error);
         return { success: false, message: error?.message || 'Unknown error getting Python logs' };
+    }
+});
+
+// Add handler to get monitor status directly from collected output
+ipcMain.handle('get-monitor-status', async () => {
+    try {
+        // Try to get fresh data from Supabase (preferred source)
+        if (sentinelUserId) {
+            const supabaseConfigs = await getMonitorConfigurations(sentinelUserId);
+            if (supabaseConfigs && Object.keys(supabaseConfigs).length > 0) {
+                console.log('Using monitor configurations from Supabase:', supabaseConfigs);
+                lastMonitorStatusJson = supabaseConfigs; // Update cached data
+                return { 
+                    success: true, 
+                    status: supabaseConfigs,
+                    source: 'supabase' 
+                };
+            }
+        }
+        
+        // Fallback to stored configurations from stdout parsing
+        if (Object.keys(lastMonitorStatusJson).length > 0) {
+            console.log('Using cached monitor configurations:', lastMonitorStatusJson);
+            return { 
+                success: true, 
+                status: lastMonitorStatusJson,
+                source: 'stored' 
+            };
+        }
+        
+        // Try to extract from stdout as last resort
+        if (capturedStdout) {
+            const jsonLinePrefix = "MONITOR_STATUS_JSON: ";
+            const rawJsonIndex = capturedStdout.indexOf(jsonLinePrefix);
+            
+            if (rawJsonIndex !== -1) {
+                // Extract the JSON part - we need to be careful with newlines
+                try {
+                    // Find the start of the JSON
+                    const jsonStart = rawJsonIndex + jsonLinePrefix.length;
+                    // Find the end of the line (this might be the end of the JSON)
+                    let jsonEnd = capturedStdout.indexOf('\n', jsonStart);
+                    if (jsonEnd === -1) jsonEnd = capturedStdout.length;
+
+                    // Extract just the JSON part
+                    const jsonString = capturedStdout.substring(jsonStart, jsonEnd).trim();
+                    console.log("Attempting to parse extracted JSON string:", jsonString);
+                    
+                    const parsedStatus = JSON.parse(jsonString);
+                    lastMonitorStatusJson = parsedStatus; // Store for future use
+                    console.log("Successfully parsed monitor status from stdout:", parsedStatus);
+                    return { 
+                        success: true, 
+                        status: parsedStatus,
+                        source: 'parsed' 
+                    };
+                } catch (e) {
+                    console.error("Error parsing raw monitor status JSON:", e);
+                }
+            } else {
+                console.log("Monitor status JSON not found in stdout");
+            }
+        }
+        
+        // Default fallback - return default values based on what monitors require admin
+        const defaultStatus = {
+            Login: isRunningAsAdmin,
+            Process: true,
+            Network: isRunningAsAdmin,
+            Filesystem: true,
+            System: isRunningAsAdmin,
+            Browser: true,
+            USB: isRunningAsAdmin
+        };
+        console.log("Using default monitor status:", defaultStatus);
+        return { 
+            success: true, 
+            status: defaultStatus,
+            source: 'default' 
+        };
+    } catch (error: any) {
+        console.error('Error getting monitor status:', error);
+        return { 
+            success: false, 
+            message: error?.message || 'Unknown error getting monitor status',
+            status: {} 
+        };
     }
 });

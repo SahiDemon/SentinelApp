@@ -80,27 +80,51 @@ class SentinelMonitor:
             
         # Store configurations, defer instantiation for admin-required monitors
         self.monitors_config = {
-            'Login': {'class': LoginMonitor, 'requires_admin': True, 'instance': None, 'status': False},
-            'Process': {'class': ProcessMonitor, 'requires_admin': False, 'instance': None, 'status': False},
-            'Network': {'class': NetworkMonitor, 'requires_admin': True, 'instance': None, 'status': False},
-            'Filesystem': {'class': FileSystemMonitor, 'requires_admin': False, 'instance': None, 'status': False},
-            'System': {'class': SystemMonitor, 'requires_admin': True, 'instance': None, 'status': False},
-            'Browser': {'class': BrowserMonitor, 'requires_admin': True, 'instance': None, 'status': False},
-            'USB': {'class': USBMonitor, 'requires_admin': True, 'instance': None, 'status': False}
+            'Login': {'class': LoginMonitor, 'requires_admin': True, 'instance': None, 'status': False, 'enabled': True, 'type': 'login'},
+            'Process': {'class': ProcessMonitor, 'requires_admin': False, 'instance': None, 'status': False, 'enabled': True, 'type': 'process'},
+            'Network': {'class': NetworkMonitor, 'requires_admin': True, 'instance': None, 'status': False, 'enabled': True, 'type': 'network'},
+            'Filesystem': {'class': FileSystemMonitor, 'requires_admin': False, 'instance': None, 'status': False, 'enabled': True, 'type': 'filesystem'},
+            'System': {'class': SystemMonitor, 'requires_admin': True, 'instance': None, 'status': False, 'enabled': True, 'type': 'system'},
+            'Browser': {'class': BrowserMonitor, 'requires_admin': True, 'instance': None, 'status': False, 'enabled': True, 'type': 'browser'},
+            'USB': {'class': USBMonitor, 'requires_admin': True, 'instance': None, 'status': False, 'enabled': True, 'type': 'usb'}
         }
         
         # Create OpenSearch logger with user identity
         self.opensearch_logger = OpenSearchLogger(electron_user_id=self.user_id)
         
+        # Log initial configuration state
+        print("Initial monitor configuration before fetching from Supabase:", flush=True)
+        for name, config in self.monitors_config.items():
+            enabled_status = "ENABLED" if config['enabled'] else "DISABLED"
+            print(f"  - {name}: {enabled_status} (Requires admin: {config['requires_admin']})", flush=True)
+        
+        # Fetch monitor configurations from database if possible
+        self._fetch_monitor_configurations()
+        
+        # Log updated configuration state
+        print("Updated monitor configuration after fetching from Supabase:", flush=True)
+        for name, config in self.monitors_config.items():
+            enabled_status = "ENABLED" if config['enabled'] else "DISABLED"
+            print(f"  - {name}: {enabled_status} (Requires admin: {config['requires_admin']})", flush=True)
+            
         # Log session start
         self._log_session_start()
         
-        # Instantiate non-admin monitors immediately
+        # Instantiate non-admin monitors immediately (if enabled)
         for name, config in self.monitors_config.items():
-            if not config['requires_admin']:
+            if not config['requires_admin'] and config['enabled']:
                 try:
                     self.logger.info(f"Instantiating non-admin monitor: {name}")
-                    config['instance'] = config['class'](electron_user_id=self.user_id)
+                    
+                    # Special handling for filesystem monitor
+                    if name == 'Filesystem':
+                        directories = self._fetch_file_monitoring_directories()
+                        if directories:
+                            config['instance'] = config['class'](electron_user_id=self.user_id, monitoring_directories=directories)
+                        else:
+                            config['instance'] = config['class'](electron_user_id=self.user_id)
+                    else:
+                        config['instance'] = config['class'](electron_user_id=self.user_id)
                 except Exception as e:
                     self.logger.error(f"Error instantiating {name} monitor in __init__: {e}", exc_info=True)
                     config['status'] = False # Mark as failed
@@ -140,6 +164,168 @@ class SentinelMonitor:
             self.logger.error(f"Error getting device info: {e}")
             return {"error": str(e)}
     
+    def _fetch_monitor_configurations(self):
+        """Fetch monitor configurations from database"""
+        try:
+            # Use OpenSearch logger to get Supabase config
+            supabase_url = self.opensearch_logger.supabase_url
+            supabase_key = self.opensearch_logger.supabase_key
+            
+            if not supabase_url or not supabase_key:
+                self.logger.warning("No Supabase credentials available for fetching monitor configurations")
+                print("WARNING: No Supabase credentials found - using default monitor settings", file=sys.stderr, flush=True)
+                return
+            
+            # Make a request to the Supabase API
+            import requests
+            headers = {
+                "apikey": supabase_key,
+                "Authorization": f"Bearer {supabase_key}",
+                "Content-Type": "application/json",
+                "Prefer": "return=representation"
+            }
+            
+            # Debug logging
+            request_url = f"{supabase_url}/rest/v1/monitor_configurations"
+            self.logger.info(f"Fetching monitor configurations from: {request_url}")
+            print(f"Fetching monitor configurations from Supabase...", flush=True)
+            
+            # Fetch monitor configurations
+            response = requests.get(request_url, headers=headers)
+            
+            # Debug response
+            self.logger.info(f"Monitor configurations response status: {response.status_code}")
+            if response.status_code != 200:
+                self.logger.warning(f"Response error: {response.text}")
+                print(f"ERROR: Failed to fetch monitor configurations (HTTP {response.status_code})", file=sys.stderr, flush=True)
+            
+            if response.status_code == 200:
+                configurations = response.json()
+                self.logger.info(f"Fetched {len(configurations)} monitor configurations")
+                print(f"SUCCESS: Fetched {len(configurations)} monitor configurations", flush=True)
+                
+                # Log initial configuration state before changes
+                initial_states = {}
+                for name, config in self.monitors_config.items():
+                    initial_states[name] = config.get('enabled', True)
+                
+                # Update monitor configurations based on database settings
+                for config in configurations:
+                    monitor_type = config.get('monitor_type')
+                    is_enabled = config.get('is_enabled', True)
+                    
+                    # Map the monitor_type to our monitor name
+                    for name, monitor_config in self.monitors_config.items():
+                        if monitor_config['type'] == monitor_type:
+                            prev_state = monitor_config['enabled']
+                            monitor_config['enabled'] = is_enabled
+                            if prev_state != is_enabled:
+                                action = "enabled" if is_enabled else "disabled"
+                                self.logger.info(f"Monitor {name} has been {action} based on configuration")
+                                print(f"CONFIG: {name} monitor is now {action}", flush=True)
+                
+                # Log final configuration state
+                changed_monitors = []
+                for name, config in self.monitors_config.items():
+                    current_state = config.get('enabled', True)
+                    if current_state != initial_states.get(name, True):
+                        status = "ENABLED" if current_state else "DISABLED" 
+                        changed_monitors.append(f"{name}: {status}")
+                
+                if changed_monitors:
+                    self.logger.info(f"Monitor configuration changes: {', '.join(changed_monitors)}")
+                    print(f"APPLIED CONFIGURATION CHANGES: {', '.join(changed_monitors)}", flush=True)
+                else:
+                    print("No changes to monitor configurations were needed", flush=True)
+
+                # Print a JSON string with the final status of all monitors
+                monitor_statuses = {}
+                for name, config in self.monitors_config.items():
+                    monitor_statuses[name] = config.get('enabled', True)
+                print(f"MONITOR_STATUS_JSON: {json.dumps(monitor_statuses)}", flush=True)
+
+            else:
+                self.logger.warning(f"Failed to fetch monitor configurations: {response.status_code}")
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Network error fetching monitor configurations: {e}", exc_info=True)
+            print(f"ERROR: Network problem connecting to Supabase: {e}", file=sys.stderr, flush=True)
+        except Exception as e:
+            self.logger.error(f"Error fetching monitor configurations: {e}", exc_info=True)
+            print(f"ERROR: Failed to process monitor configurations: {e}", file=sys.stderr, flush=True)
+    
+    def _fetch_file_monitoring_directories(self):
+        """Fetch file monitoring directories from database"""
+        try:
+            # Use OpenSearch logger to get Supabase config
+            supabase_url = self.opensearch_logger.supabase_url
+            supabase_key = self.opensearch_logger.supabase_key
+            
+            if not supabase_url or not supabase_key:
+                self.logger.warning("No Supabase credentials available for fetching file monitoring directories")
+                print("WARNING: No Supabase credentials found for file monitoring - using default directories", file=sys.stderr, flush=True)
+                return None
+            
+            # Make a request to the Supabase API
+            import requests
+            headers = {
+                "apikey": supabase_key,
+                "Authorization": f"Bearer {supabase_key}",
+                "Content-Type": "application/json",
+                "Prefer": "return=representation"
+            }
+            
+            # Debug logging
+            request_url = f"{supabase_url}/rest/v1/file_monitoring_directories?is_enabled=eq.true"
+            self.logger.info(f"Fetching file monitoring directories from: {request_url}")
+            print(f"Fetching file monitoring directories from Supabase...", flush=True)
+            
+            # Fetch file monitoring directories
+            response = requests.get(request_url, headers=headers)
+            
+            # Debug response
+            self.logger.info(f"File monitoring directories response status: {response.status_code}")
+            if response.status_code != 200:
+                self.logger.warning(f"Response error: {response.text}")
+                print(f"ERROR: Failed to fetch file monitoring directories (HTTP {response.status_code})", file=sys.stderr, flush=True)
+                return None
+            
+            if response.status_code == 200:
+                directories = response.json()
+                self.logger.info(f"Fetched {len(directories)} file monitoring directories")
+                print(f"SUCCESS: Fetched {len(directories)} file monitoring directories", flush=True)
+                
+                # Filter directories based on scope (global or user-specific)
+                filtered_dirs = []
+                for dir_config in directories:
+                    # Include directory if it's global (user_id is null) or if it matches this user
+                    if dir_config.get('user_id') is None or dir_config.get('user_id') == self.user_id:
+                        directory_path = dir_config.get('directory_path')
+                        recursive = dir_config.get('is_recursive', False)
+                        filtered_dirs.append(directory_path)
+                        log_msg = f"Added directory: {directory_path} (recursive: {recursive})"
+                        self.logger.info(log_msg)
+                        print(log_msg, flush=True)
+                
+                if filtered_dirs:
+                    self.logger.info(f"Using {len(filtered_dirs)} file monitoring directories: {filtered_dirs}")
+                    print(f"APPLIED FILE MONITOR CONFIG: Monitoring {len(filtered_dirs)} directories", flush=True)
+                    return filtered_dirs
+                else:
+                    self.logger.info("No applicable file monitoring directories found")
+                    print("No applicable file monitoring directories found - using defaults", flush=True)
+                    return None
+            else:
+                self.logger.warning(f"Failed to fetch file monitoring directories: {response.status_code}")
+                return None
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Network error fetching file monitoring directories: {e}", exc_info=True)
+            print(f"ERROR: Network problem connecting to Supabase for file monitoring: {e}", file=sys.stderr, flush=True)
+            return None
+        except Exception as e:
+            self.logger.error(f"Error fetching file monitoring directories: {e}", exc_info=True)
+            print(f"ERROR: Failed to process file monitoring directories: {e}", file=sys.stderr, flush=True)
+            return None
+
     def _log_session_start(self):
         """Log session start event to OpenSearch"""
         try:
@@ -182,11 +368,19 @@ class SentinelMonitor:
         monitor_class = monitor_info['class']
         requires_admin = monitor_info['requires_admin']
         monitor_instance = monitor_info.get('instance')
+        is_enabled = monitor_info.get('enabled', True)
+
+        # Skip if the monitor is disabled
+        if not is_enabled:
+            self.logger.info(f"Skipping {name} monitor: disabled in configuration.")
+            print(f"INFO: {name} monitor is disabled in configuration - not starting", flush=True)
+            self.monitors_config[name]['status'] = False
+            return
 
         # Skip if admin required but not available
         if requires_admin and not self.is_admin:
             self.logger.warning(f"Skipping {name} monitor: requires admin privileges which are not available.")
-            print(f"WARNING: Skipping {name} monitor (requires admin)", file=sys.stderr, flush=True)
+            print(f"WARNING: Skipping {name} monitor (requires admin privileges)", file=sys.stderr, flush=True)
             self.monitors_config[name]['status'] = False
             return
 
@@ -194,7 +388,18 @@ class SentinelMonitor:
         if monitor_instance is None:
             try:
                 self.logger.info(f"Instantiating monitor: {name} (Requires Admin: {requires_admin}) ...")
-                monitor_instance = monitor_class(electron_user_id=self.user_id)
+                print(f"Initializing {name} monitor...", flush=True)
+                
+                # Special handling for filesystem monitor to include directories
+                if name == 'Filesystem':
+                    directories = self._fetch_file_monitoring_directories()
+                    if directories:
+                        monitor_instance = monitor_class(electron_user_id=self.user_id, monitoring_directories=directories)
+                    else:
+                        monitor_instance = monitor_class(electron_user_id=self.user_id)
+                else:
+                    monitor_instance = monitor_class(electron_user_id=self.user_id)
+                    
                 self.monitors_config[name]['instance'] = monitor_instance # Store the created instance
             except PermissionError as pe:
                  err_msg = f"PermissionError during instantiation of {name} monitor: {str(pe)}"
@@ -214,6 +419,14 @@ class SentinelMonitor:
              self.logger.error(f"Cannot start {name} monitor: Instance is None after instantiation attempt.")
              self.monitors_config[name]['status'] = False
              return
+
+        # Double check enabled status before actually starting the monitor
+        # This handles cases where config was changed after instantiation
+        if not self.monitors_config[name].get('enabled', True):
+            self.logger.info(f"Not starting {name} monitor: disabled after instantiation.")
+            print(f"INFO: {name} monitor was disabled after initialization - not starting", flush=True)
+            self.monitors_config[name]['status'] = False
+            return
 
         # Run the monitor's main loop
         try:

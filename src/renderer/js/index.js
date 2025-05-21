@@ -468,6 +468,34 @@ async function updateMonitorStatus() {
         // Get status from backend
         const status = await window.api.checkSentinelStatus();
         
+        // Also get Python logs to check actual monitor configuration
+        const pythonLogsResult = await window.api.getPythonLogs();
+        let monitorConfigurations = {};
+        
+        // Parse Python logs to determine which monitors are actually enabled/disabled
+        if (pythonLogsResult.success && pythonLogsResult.logs) {
+            const logs = pythonLogsResult.logs;
+            
+            // Look for the "Updated monitor configuration after fetching from Supabase:" section
+            const configSection = logs.split("Updated monitor configuration after fetching from Supabase:")[1];
+            if (configSection) {
+                // Extract monitor configuration lines
+                const configLines = configSection.split('\n').filter(line => line.trim().startsWith('-'));
+                
+                // Parse each line to get monitor name and enabled status
+                configLines.forEach(line => {
+                    const match = line.match(/\s*-\s*([^:]+):\s*(ENABLED|DISABLED)/);
+                    if (match) {
+                        const monitorName = match[1].trim().toLowerCase();
+                        const isEnabled = match[2] === 'ENABLED';
+                        monitorConfigurations[monitorName] = { enabled: isEnabled };
+                    }
+                });
+                
+                console.log("Parsed monitor configurations:", monitorConfigurations);
+            }
+        }
+        
         // Create status elements
         let statusHTML = `
             <div class="monitor-status-header">
@@ -478,25 +506,43 @@ async function updateMonitorStatus() {
             
         // Define the monitors we want to show
         const monitors = [
-            { id: 'usb_monitor', name: 'USB Monitor', icon: 'usb' },
-            { id: 'system_monitor', name: 'System Monitor', icon: 'laptop' },
-            { id: 'process_monitor', name: 'Process Monitor', icon: 'tasks' },
-            { id: 'network_monitor', name: 'Network Monitor', icon: 'network-wired' },
-            { id: 'browser_monitor', name: 'Browser Monitor', icon: 'globe' },
-            { id: 'login_monitor', name: 'Login Monitor', icon: 'sign-in-alt' },
-            { id: 'filesystem_monitor', name: 'Filesystem Monitor', icon: 'folder' }
+            { id: 'usb', name: 'USB Monitor', icon: 'usb' },
+            { id: 'system', name: 'System Monitor', icon: 'laptop' },
+            { id: 'process', name: 'Process Monitor', icon: 'tasks' },
+            { id: 'network', name: 'Network Monitor', icon: 'network-wired' },
+            { id: 'browser', name: 'Browser Monitor', icon: 'globe' },
+            { id: 'login', name: 'Login Monitor', icon: 'sign-in-alt' },
+            { id: 'filesystem', name: 'Filesystem Monitor', icon: 'folder' }
         ];
         
-        // For demo/development, assume all are running if we can't determine status
+        // Check if sentinel is running at all
         const isRunning = status.running;
         
         // Add each monitor's status
         monitors.forEach(monitor => {
-            // Check monitor status - if sentinel is running, consider monitors active
-            // In a real implementation, you would use status.monitors[monitor.id]
-            const isActive = isRunning;
-            const statusClass = isActive ? 'status-active' : 'status-inactive';
-            const statusText = isActive ? 'Active' : 'Inactive';
+            // Match monitor ID to configuration key
+            const monitorConfigKey = monitor.name.replace(' Monitor', '').toLowerCase();
+            
+            // Check if this monitor is explicitly disabled in the parsed configuration
+            const configInfo = monitorConfigurations[monitorConfigKey];
+            const isEnabledInConfig = configInfo ? configInfo.enabled : true; // Default to true if not found
+            
+            // Determine monitor status
+            let statusClass, statusText;
+            
+            if (!isRunning) {
+                // Sentinel not running at all
+                statusClass = 'status-inactive';
+                statusText = 'Inactive';
+            } else if (!isEnabledInConfig) {
+                // Monitor disabled in configuration
+                statusClass = 'status-disabled';
+                statusText = 'Disabled';
+            } else {
+                // Monitor is enabled and should be running
+                statusClass = 'status-active';
+                statusText = 'Active';
+            }
             
             statusHTML += `
                 <div class="monitor-status-item">

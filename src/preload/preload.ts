@@ -57,6 +57,10 @@ contextBridge.exposeInMainWorld(
         },
         getPythonLogs: (): Promise<{ success: boolean; logs?: string; message?: string; }> => {
             return ipcRenderer.invoke('get-python-logs');
+        },
+        // New method to get monitor status directly
+        getMonitorStatus: (): Promise<{ success: boolean; status?: any; message?: string; }> => {
+            return ipcRenderer.invoke('get-monitor-status');
         }
     }
 );

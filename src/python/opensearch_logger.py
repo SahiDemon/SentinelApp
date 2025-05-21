@@ -42,6 +42,10 @@ class OpenSearchLogger:
             
         self.electron_user_id = electron_user_id # Store the Electron user ID
         self.pid = os.getpid()
+        
+        # Add Supabase configuration
+        self.supabase_url = os.environ.get('SUPABASE_URL', 'https://qackdhpbvfbeyhxovlqj.supabase.co')
+        self.supabase_key = os.environ.get('SUPABASE_KEY', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhY2tkaHBidmZiZXloeG92bHFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc5NTUzNzIsImV4cCI6MjA1MzUzMTM3Mn0.JZbYaTngJy3lGFqtvI3efcmxdosdmD48Nv2zgTeaHY0')
 
         # Get timeout and retry settings from environment variables or use defaults
         timeout = int(os.environ.get('OPENSEARCH_TIMEOUT', 30))

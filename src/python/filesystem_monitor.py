@@ -46,7 +46,7 @@ def is_admin():
         return False
 
 class UserFileMonitor:
-    def __init__(self, log_dir=None, electron_user_id=None):
+    def __init__(self, log_dir=None, electron_user_id=None, monitoring_directories=None):
         self.logger = setup_logger('user_file_monitor')
         self.opensearch_logger = OpenSearchLogger(electron_user_id=electron_user_id)
         self.logger.info("FileSystem Monitor initialized. Attempting to connect to OpenSearch...")
@@ -54,6 +54,11 @@ class UserFileMonitor:
             self.logger.warning("Failed to connect to OpenSearch. Logs will not be sent.")
         else:
             self.logger.info("OpenSearch connection successful.")
+            
+        # Store custom monitoring directories
+        self.monitoring_directories = monitoring_directories
+        if self.monitoring_directories:
+            self.logger.info(f"Custom monitoring directories provided: {self.monitoring_directories}")
         
         # Add recycling bin paths to ignore
         self.ignore_patterns = {
@@ -440,8 +445,15 @@ class UserFileMonitor:
         event_handler = UserFileHandler(self)
         observer = Observer()
         
+        # Store custom monitoring directories as an instance variable
+        self.custom_monitoring_directories = getattr(self, 'monitoring_directories', None)
+        
+        # If custom directories are provided, use them
+        if hasattr(self, 'monitoring_directories') and self.monitoring_directories:
+            self.logger.info(f"Using custom monitoring directories from configuration")
+            paths_to_monitor = self.monitoring_directories
         # If not admin, use fallback paths
-        if not is_admin():
+        elif not is_admin():
             self.logger.warning("Running without admin rights - monitoring user directories only")
             paths_to_monitor = self.fallback_paths
         else:

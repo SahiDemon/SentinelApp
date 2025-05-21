@@ -1376,3 +1376,153 @@ button:hover {
         transform: translateY(0);
     }
 }
+
+/* Add these styles to properly show the monitor status with different colors */
+
+/* Monitor Status Styles */
+.monitor-status-container {
+    padding: 1rem;
+}
+
+.monitor-status-list {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+}
+
+.monitor-status-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: rgba(0, 30, 60, 0.5);
+}
+
+.monitor-icon {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(0, 163, 255, 0.15);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: var(--primary);
+    font-size: 18px;
+    box-shadow: 0 0 6px rgba(0, 163, 255, 0.2);
+    border: 1px solid rgba(0, 163, 255, 0.2);
+}
+
+.monitor-name {
+    flex-grow: 1;
+    font-weight: 500;
+}
+
+.monitor-status {
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    text-align: center;
+    min-width: 80px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Status colors */
+.status-active {
+    background-color: rgba(82, 196, 26, 0.1);
+    color: var(--success-color);
+    border: 1px solid rgba(82, 196, 26, 0.3);
+}
+
+.status-active::before {
+    content: "•";
+    font-size: 18px;
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+    animation-timing-function: ease;
+}
+
+.status-inactive {
+    background-color: rgba(128, 128, 128, 0.1);
+    color: #cccccc;
+    border: 1px solid rgba(128, 128, 128, 0.3);
+}
+
+/* Disabled state - yellow tint */
+.status-disabled {
+    background-color: rgba(250, 173, 20, 0.1);
+    color: var(--warning-color);
+    border: 1px solid rgba(250, 173, 20, 0.3);
+}
+
+/* Error state - red tint */
+.status-error {
+    background-color: rgba(255, 77, 79, 0.1);
+    color: var(--danger-color);
+    border: 1px solid rgba(255, 77, 79, 0.3);
+}
+
+/* Refresh button styles */
+.status-button {
+    background-color: rgba(0, 163, 255, 0.2);
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-size: 12px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: auto;
+}
+
+.status-button:hover {
+    background-color: rgba(0, 163, 255, 0.4);
+    box-shadow: 0 0 10px var(--primary-glow);
+}
+
+/* Add these custom status indicator styles at the bottom of the file */
+
+/* Custom Monitor Status Styles */
+.monitor-status-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+}
+
+.monitor-status-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: rgba(0, 30, 60, 0.5);
+}
+
+.monitor-icon {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(0, 163, 255, 0.15);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: var(--primary);
+    font-size: 18px;
+    box-shadow: 0 0 6px rgba(0, 163, 255, 0.2);
+    border: 1px solid rgba(0, 163, 255, 0.2);
+}
+
+.status-disabled {
+    background-color: rgba(250, 173, 20, 0.1);
+    color: var(--warning-color);
+    border: 1px solid rgba(250, 173, 20, 0.3);
+}

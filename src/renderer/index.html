@@ -136,12 +136,6 @@
 
         <div class="tab-content" id="monitor-status-tab-content">
             <div class="monitor-status-card">
-                <div class="monitor-status-header">
-                    <h3>Monitor Status</h3>
-                    <button id="refresh-status" class="status-button">
-                        <i class="fas fa-sync-alt"></i> Refresh
-                    </button>
-                </div>
                 <div id="monitor-status-container" class="monitor-status-container">
                     <div class="loading-indicator">
                         <i class="fas fa-circle-notch fa-spin"></i> Loading monitor status...
@@ -188,6 +182,230 @@
             const loadingOverlay = new LoadingOverlay();
             loadingOverlay.start();
         };
+    </script>
+    
+    <!-- Custom script to override monitor status display -->
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM content loaded - initializing monitor status override");
+            
+            const monitorTab = document.querySelector('[data-tab="monitor-status"]');
+            if (monitorTab) {
+                monitorTab.addEventListener('click', () => overrideMonitorStatus(/* fromTabClick */ true));
+            }
+            
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    if (event.currentTarget.getAttribute('data-tab') === 'monitor-status') {
+                        setTimeout(() => overrideMonitorStatus(/* fromTabSwitch */ true), 100);
+                    }
+                });
+            });
+            
+            // Initial attempt to load status
+            overrideMonitorStatus(/* fromInitialLoad */ false, 5, 4000, 2500); // Retry 5 times, 4s initial delay, 2.5s retry delay
+        });
+        
+        async function overrideMonitorStatus(isUserInitiated = false, maxRetries = 4, initialDelay = 1000, retryDelay = 2500) {
+            console.log(`overrideMonitorStatus called. User initiated: ${isUserInitiated}, Max retries: ${maxRetries}, Initial delay: ${initialDelay}ms, Retry delay: ${retryDelay}ms`);
+            const monitorStatusContainer = document.getElementById('monitor-status-container');
+            
+            if (!monitorStatusContainer) {
+                console.error("Monitor status container not found in overrideMonitorStatus.");
+                return;
+            }
+
+            if (isUserInitiated || !document.hidden) { // Only show loading if tab is active or user clicked
+                monitorStatusContainer.innerHTML = '<div class="loading-indicator"><i class="fas fa-circle-notch fa-spin"></i> Loading monitor status...</div>';
+            }
+
+            let attempt = 0;
+            async function tryFetchAndParse() {
+                attempt++;
+                console.log(`Attempt ${attempt}/${maxRetries} to fetch and parse monitor status.`);
+                try {
+                    const sentinelOverallStatus = await window.api.checkSentinelStatus();
+                    let monitorConfigurations = {};
+                    let foundJson = false;
+
+                    // Try to get the monitor status directly from the main process
+                    const monitorStatusResult = await window.api.getMonitorStatus();
+                    console.log("Monitor status API result:", monitorStatusResult);
+
+                    if (monitorStatusResult.success && monitorStatusResult.status) {
+                        monitorConfigurations = monitorStatusResult.status;
+                        console.log(`Using monitor configurations from direct API (source: ${monitorStatusResult.source}):`, monitorConfigurations);
+                        foundJson = true;
+                    } else {
+                        console.log("Direct API did not return valid status, falling back to log parsing");
+                        
+                        // Fallback to previous method of log parsing if direct API doesn't work
+                        const pythonLogsResult = await window.api.getPythonLogs();
+                        
+                        if (pythonLogsResult.success && pythonLogsResult.logs) {
+                            const logs = pythonLogsResult.logs;
+                            console.log(`Python logs length: ${logs.length} characters`);
+                            console.log(`First 100 chars: ${logs.substring(0, 100)}`);
+                            console.log(`Last 100 chars: ${logs.substring(logs.length - 100)}`);
+                            
+                            // Direct search in raw logs first
+                            const jsonLinePrefix = "MONITOR_STATUS_JSON: ";
+                            const rawJsonIndex = logs.indexOf(jsonLinePrefix);
+                            
+                            if (rawJsonIndex !== -1) {
+                                console.log(`Found MONITOR_STATUS_JSON at position ${rawJsonIndex} in raw logs`);
+                                // Extract the JSON part
+                                const jsonStart = rawJsonIndex + jsonLinePrefix.length;
+                                const jsonEnd = logs.indexOf('\n', jsonStart);
+                                const jsonString = jsonEnd !== -1 ? 
+                                    logs.substring(jsonStart, jsonEnd) : 
+                                    logs.substring(jsonStart);
+                                    
+                                console.log("Extracted JSON string from raw logs:", jsonString);
+                                try {
+                                    monitorConfigurations = JSON.parse(jsonString);
+                                    console.log("Successfully parsed monitor configurations JSON:", monitorConfigurations);
+                                    foundJson = true;
+                                } catch (e) {
+                                    console.error("Error parsing raw MONITOR_STATUS_JSON:", e, "String was:", jsonString);
+                                }
+                            } else {
+                                console.log("MONITOR_STATUS_JSON not found in raw logs, trying line-by-line search");
+                                const lines = logs.split('\n');
+                                console.log(`Log contains ${lines.length} lines`);
+                                
+                                let jsonString = null;
+
+                                // Line by line search
+                                for (let i = lines.length - 1; i >= 0; i--) {
+                                    if (lines[i].includes(jsonLinePrefix)) {
+                                        jsonString = lines[i].substring(lines[i].indexOf(jsonLinePrefix) + jsonLinePrefix.length);
+                                        console.log("Found latest MONITOR_STATUS_JSON string in line search:", jsonString);
+                                        try {
+                                            monitorConfigurations = JSON.parse(jsonString);
+                                            console.log("Successfully parsed monitor configurations JSON:", monitorConfigurations);
+                                            foundJson = true;
+                                            break;
+                                        } catch (e) {
+                                            console.error("Error parsing MONITOR_STATUS_JSON from line search:", e, "String was:", jsonString);
+                                        }
+                                    }
+                                }
+
+                                // If not found, log some sample lines to help debug
+                                if (!foundJson) {
+                                    console.log("Could not find MONITOR_STATUS_JSON in logs. Sample of last 15 lines:");
+                                    for (let i = Math.max(0, lines.length - 15); i < lines.length; i++) {
+                                        console.log(`Line ${i}: ${lines[i].substring(0, 100)}`);
+                                    }
+                                }
+                            }
+                        } else {
+                            console.warn("Failed to get Python logs or logs were empty during attempt:", attempt);
+                        }
+                    }
+
+                    // Always update UI at the end of this attempt, whether we found configs or not
+                    // This ensures the UI doesn't stay in loading state forever
+                    if (foundJson || attempt >= maxRetries) {
+                        updateStatusUI(sentinelOverallStatus, monitorConfigurations);
+                    } else if (attempt < maxRetries) {
+                        console.log(`Retrying in ${retryDelay}ms...`);
+                        setTimeout(tryFetchAndParse, retryDelay);
+                    }
+                    
+                } catch (error) {
+                    console.error("Error during tryFetchAndParse attempt:", attempt, error);
+                    if (attempt >= maxRetries) {
+                        updateStatusUI(null, {}, `Error fetching status after ${maxRetries} attempts.`);
+                    } else {
+                        setTimeout(tryFetchAndParse, retryDelay);
+                    }
+                }
+            }
+            
+            // Start the first attempt after an initial delay
+            setTimeout(tryFetchAndParse, initialDelay);
+            
+            function updateStatusUI(sentinelOverallStatus, monitorConfigurations, errorMessage = null) {
+                console.log("Updating UI with configurations:", monitorConfigurations, "Overall status:", sentinelOverallStatus);
+                const monitorStatusContainer = document.getElementById('monitor-status-container');
+                if (!monitorStatusContainer) {
+                    console.error("Monitor status container not found in updateStatusUI.");
+                    return;
+                }
+
+                if (errorMessage) {
+                    monitorStatusContainer.innerHTML = `<div class="error-message">${errorMessage}</div>`;
+                    return;
+                }
+
+                let statusHTML = `
+                    <div class="monitor-status-header">
+                        <h3>Monitor Status</h3>
+                        <button id="refresh-status-override" class="status-button"><i class="fas fa-sync"></i> Refresh</button>
+                    </div>
+                    <div class="monitor-status-list">`;
+                
+                const monitors = [
+                    { key: 'USB', name: 'USB Monitor', icon: 'usb' },
+                    { key: 'System', name: 'System Monitor', icon: 'laptop' },
+                    { key: 'Process', name: 'Process Monitor', icon: 'tasks' },
+                    { key: 'Network', name: 'Network Monitor', icon: 'network-wired' },
+                    { key: 'Browser', name: 'Browser Monitor', icon: 'globe' },
+                    { key: 'Login', name: 'Login Monitor', icon: 'sign-in-alt' },
+                    { key: 'Filesystem', name: 'Filesystem Monitor', icon: 'folder' }
+                ];
+                
+                const isSentinelRunning = sentinelOverallStatus && sentinelOverallStatus.running;
+                
+                monitors.forEach(monitor => {
+                    // First check if we have a direct configuration for this monitor
+                    let isEnabledInConfig = 
+                        monitorConfigurations && 
+                        monitorConfigurations.hasOwnProperty(monitor.key) ? 
+                            monitorConfigurations[monitor.key] : null;
+                    
+                    // If not found using capitalized key, try lowercase key
+                    if (isEnabledInConfig === null) {
+                        const lowerKey = monitor.key.toLowerCase();
+                        isEnabledInConfig = 
+                            monitorConfigurations && 
+                            monitorConfigurations.hasOwnProperty(lowerKey) ? 
+                                monitorConfigurations[lowerKey] : true; // Default to enabled
+                    }
+                    
+                    let statusClass, statusText;
+                    
+                    if (!isSentinelRunning) {
+                        statusClass = 'status-inactive';
+                        statusText = 'Inactive';
+                    } else if (isEnabledInConfig === false) {
+                        statusClass = 'status-disabled';
+                        statusText = 'Disabled';
+                    } else {
+                        statusClass = 'status-active';
+                        statusText = 'Active';
+                    }
+                    
+                    statusHTML += `
+                        <div class="monitor-status-item">
+                            <div class="monitor-icon"><i class="fas fa-${monitor.icon}"></i></div>
+                            <div class="monitor-name">${monitor.name}</div>
+                            <div class="monitor-status ${statusClass}">${statusText}</div>
+                        </div>`;
+                });
+                
+                statusHTML += `</div>`;
+                monitorStatusContainer.innerHTML = statusHTML;
+                
+                const refreshButtonNew = document.getElementById('refresh-status-override');
+                if (refreshButtonNew) {
+                    refreshButtonNew.addEventListener('click', () => overrideMonitorStatus(/* fromRefreshButton */ true));
+                }
+            }
+        }
     </script>
 </body>
 </html>
