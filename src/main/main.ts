@@ -5,11 +5,48 @@ import os from 'os';
 import { spawn, ChildProcess, exec } from 'child_process';
 import fs from 'fs';
 import http from 'http';
+import dotenv from 'dotenv';
 import deviceRegistry from './device-registry';
 import { getMonitorConfigurations } from './supabase-client';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Load environment variables from cred.env (preferred) or .env
+function loadEnvironment() {
+  const appRoot = path.resolve(process.cwd());
+  const credEnvPath = path.join(appRoot, 'cred.env');
+  const defaultEnvPath = path.join(appRoot, '.env');
+  
+  try {
+    // Try cred.env first
+    if (fs.existsSync(credEnvPath)) {
+      console.log('Loading environment from cred.env');
+      const envConfig = dotenv.parse(fs.readFileSync(credEnvPath));
+      for (const key in envConfig) {
+        process.env[key] = envConfig[key];
+      }
+      return true;
+    }
+    // Fall back to .env
+    else if (fs.existsSync(defaultEnvPath)) {
+      console.log('Loading environment from .env');
+      const envConfig = dotenv.parse(fs.readFileSync(defaultEnvPath));
+      for (const key in envConfig) {
+        process.env[key] = envConfig[key];
+      }
+      return true;
+    }
+  } catch (error) {
+    console.error('Error loading environment files:', error);
+  }
+  
+  console.warn('No environment file (cred.env or .env) found');
+  return false;
+}
+
+// Load environment variables at startup
+loadEnvironment();
 
 // Configuration for admin requirement
 const appConfig = {

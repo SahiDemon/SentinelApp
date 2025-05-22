@@ -7,17 +7,29 @@ import dotenv from 'dotenv';
 let supabaseUrl = process.env.SUPABASE_URL || '';
 let supabaseKey = process.env.SUPABASE_ANON_KEY || '';
 
-// Try to load from .env file in app root if environment variables not set
+// Try to load from .env or cred.env file in app root if environment variables not set
 if (!supabaseUrl || !supabaseKey) {
     try {
-        const envPath = path.resolve(process.cwd(), '.env');
-        if (fs.existsSync(envPath)) {
-            const envConfig = dotenv.parse(fs.readFileSync(envPath));
+        // Try cred.env first, then fall back to .env
+        const credEnvPath = path.resolve(process.cwd(), 'cred.env');
+        const defaultEnvPath = path.resolve(process.cwd(), '.env');
+        
+        // Check for cred.env first
+        if (fs.existsSync(credEnvPath)) {
+            console.log('Loading credentials from cred.env');
+            const envConfig = dotenv.parse(fs.readFileSync(credEnvPath));
+            supabaseUrl = envConfig.SUPABASE_URL || '';
+            supabaseKey = envConfig.SUPABASE_ANON_KEY || '';
+        }
+        // If not found or values are still empty, try .env
+        else if (fs.existsSync(defaultEnvPath)) {
+            console.log('Loading credentials from .env');
+            const envConfig = dotenv.parse(fs.readFileSync(defaultEnvPath));
             supabaseUrl = envConfig.SUPABASE_URL || '';
             supabaseKey = envConfig.SUPABASE_ANON_KEY || '';
         }
     } catch (error) {
-        console.error('Error loading .env file:', error);
+        console.error('Error loading environment files:', error);
     }
 }
 

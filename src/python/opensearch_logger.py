@@ -11,6 +11,9 @@ import time
 # Add parent directory to path to fix imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
+# Load environment variables from cred.env or .env
+from src.python.load_env import load_environment
+
 # Use absolute import to work with module execution
 from src.python.user_identity import user_identity
 
@@ -24,16 +27,26 @@ warnings.filterwarnings(
 class OpenSearchLogger:
     """Handles formatting and sending logs to an OpenSearch cluster."""
 
-    def __init__(self, host='search-sentinelprimeregistry-re5i27ttwnf44njaayopo6vouq.aos.us-east-1.on.aws', 
-                 port=443, 
-                 auth=('SahiDemon', 'Sahi@448866'), 
-                 index_name='sentinel_raw_logs',
+    def __init__(self, 
+                 host=None, 
+                 port=None, 
+                 auth=None, 
+                 index_name=None,
                  use_ssl=True, 
                  verify_certs=False, # Set to False for self-signed certs or AWS OS domains without custom endpoint
                  ssl_assert_hostname=False,
                  electron_user_id=None): # Add electron_user_id parameter
         
-        self.index_name = index_name
+        # Get values from environment variables or use defaults
+        self.host = host or os.environ.get('OPENSEARCH_HOST', 'search-sentinelprimeregistry-re5i27ttwnf44njaayopo6vouq.aos.us-east-1.on.aws')
+        self.port = int(port or os.environ.get('OPENSEARCH_PORT', 443))
+        self.username = os.environ.get('OPENSEARCH_USERNAME', 'SahiDemon')
+        self.password = os.environ.get('OPENSEARCH_PASSWORD', 'Sahi@448866')
+        self.index_name = index_name or os.environ.get('OPENSEARCH_INDEX', 'sentinel_raw_logs')
+        
+        # Use auth parameter if provided, otherwise use username and password from env
+        self.auth = auth or (self.username, self.password)
+        
         self.hostname = socket.gethostname()
         try:
             self.user_identifier = getpass.getuser() # This is the OS user
@@ -54,13 +67,13 @@ class OpenSearchLogger:
         # Clear any proxy settings that might interfere with the connection
         os.environ.pop('HTTP_PROXY', None)
         os.environ.pop('HTTPS_PROXY', None)
-        os.environ['NO_PROXY'] = ','.join(['localhost', '127.0.0.1', host])
+        os.environ['NO_PROXY'] = ','.join(['localhost', '127.0.0.1', self.host])
         
-        print(f"Initializing OpenSearch connection to {host}:{port} with timeout={timeout}s, retries={max_retries}")
+        print(f"Initializing OpenSearch connection to {self.host}:{self.port} with timeout={timeout}s, retries={max_retries}")
 
         self.client = OpenSearch(
-            hosts=[{'host': host, 'port': port}],
-            http_auth=auth,
+            hosts=[{'host': self.host, 'port': self.port}],
+            http_auth=self.auth,
             use_ssl=use_ssl,
             verify_certs=verify_certs,
             ssl_assert_hostname=ssl_assert_hostname,
@@ -76,7 +89,7 @@ class OpenSearchLogger:
         for attempt in range(max_connection_attempts):
             try:
                 if self.client.ping():
-                    print(f"Successfully connected to OpenSearch cluster at {host}")
+                    print(f"Successfully connected to OpenSearch cluster at {self.host}")
                     self.create_index_if_not_exists()
                     return
                 else:

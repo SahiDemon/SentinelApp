@@ -13,6 +13,9 @@ import json
 # Add parent directory to path to fix imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
+# Load environment variables from cred.env or .env
+from src.python.load_env import load_environment
+
 # When running as module (-m), imports need to be absolute from inside the module
 from src.python.opensearch_logger import OpenSearchLogger
 from src.python.login_monitor import LoginMonitor
