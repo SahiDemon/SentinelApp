@@ -1,5 +1,6 @@
 import { notificationManager } from './notifications';
 import { handleLogin as login, handleLogout as logout, getUserSecurityTier, getCurrentUser } from './auth.js';
+import { supabase } from '../../supabase/client';
 
 // Key for storing dashboard state
 const DASHBOARD_STATE_KEY = 'sentinel_dashboard_state';
@@ -338,10 +339,46 @@ async function init() {
     // Fetch initial system info
     await fetchSystemInfo();
     
+    // Fetch investigations count
+    await updateInvestigationsCount();
+    
+    // Start periodic refresh of investigations count
+    startInvestigationCountRefresh();
+    
     // User email should already be set by checkSession or handleLogin
     
     // Send user ID to main process for sentinel monitoring
     // User ID should already have been sent by checkSession or handleLogin
+}
+
+// Function to fetch and update the investigations count
+async function updateInvestigationsCount() {
+    try {
+        // Query only open investigations for all devices
+        const { data, error } = await supabase
+            .from('investigations')
+            .select('id')
+            .eq('status', 'open');
+            
+        if (error) {
+            console.error('Error fetching investigations:', error);
+            return;
+        }
+        
+        const count = data ? data.length : 0;
+        const countElement = document.getElementById('investigations-count');
+        if (countElement) {
+            countElement.textContent = count.toString();
+        }
+    } catch (error) {
+        console.error('Failed to fetch investigations count:', error);
+    }
+}
+
+// Start periodic refresh of investigations count
+function startInvestigationCountRefresh() {
+    // Refresh every 30 seconds
+    setInterval(updateInvestigationsCount, 30000);
 }
 
 // Check for existing session on startup
